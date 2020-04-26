@@ -1,0 +1,18 @@
+<?php
+
+    $config['database'] = [
+        'name' => 'Cronose', // DATABASE NAME
+        'host' => '127.0.0.1', // URL
+        'username' => 'root', // MYSQL USER
+        'password' => 'root' // USER PASSWORD
+    ];
+
+    date_default_timezone_set('Europe/Madrid');
+
+    $config['jwt_key'] = "cronose"; // Own and unique secret key
+    $config['jwt_iss'] = "localhost:3030"; // Identifies the principal that issued the JWT
+    $config['jwt_aud'] = "localhost:3030"; // Identifies the recipients that the JWT is intended for
+    $config['jwt_iat'] = 1356999524; // Identifies the time at which the JWT was issued
+    $config['jwt_nbf'] = 1357000000; // Identifies the time before which the JWT MUST NOT be accepted for processing
+    
+?>

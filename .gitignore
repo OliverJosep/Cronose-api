@@ -1,0 +1,7 @@
+.idea
+.vscode
+.htaccess
+*/*config*
+!*.example
+
+.idea/codeStyles/
