@@ -69,9 +69,11 @@ class WorkController {
     return WorkDAO::getWorksByIdAndLang($id, $lang);
   }
 
-  public static function getWork($userInitials,$userTag,$workEsp) {
+  public static function getWork($userInitials,$userTag,$workEsp,$lang) {
     $work = WorkDAO::getWork($userInitials,$userTag,$workEsp);
-    $work['user'] = UserController::getBasicUserById($work['user_id'], true);
+    $work = array('user' => UserController::getBasicUserById($work['user_id'], true)) + $work;
+    $work['translations'] = self::getWorkLangs($work['user_id'], $work['specialization_id']);
+    $work['translations'] = self::orderByLang($lang, $work['translations']);
     unset($work['user_id']);
     return $work;
   }

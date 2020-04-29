@@ -30,9 +30,7 @@ require_once '../utilities/Logger.php';
 /** JWT */
 require_once '../utilities/JWTManager.php';
 
-/* ROUTER */
-require_once '../libs/Router.php';
-$router = new Router();
+
 
 /* ROUTES */
 require_once '../utilities/routes.php';
