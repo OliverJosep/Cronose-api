@@ -35,6 +35,7 @@ class UserDAO extends DAO {
   private static function getUserBasicData(&$user, $avatar) {
     // Unset name in case of private user
     $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
+    $user['description'] = self::getUserDescription($user);
     if ($user['private']) unset($user['name'], $user['surname'], $user['surname_2'], $user['full_name']);
 
     if ($avatar) $user['avatar'] = MediaController::getById($user['avatar_id']);
@@ -42,6 +43,15 @@ class UserDAO extends DAO {
     // Unset not necessary information
     unset($user['id'], $user['avatar_id'], $user['private']);
   }
+
+  public static function getUserDescription($user) {
+    $sql = "SELECT language_id, description FROM User_Language WHERE user_id = :user_id ";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user['id'], PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);    
+  }
+
 
   public static function getAll() {
     $fields = self::$returnFields;
@@ -109,7 +119,7 @@ class UserDAO extends DAO {
 
   public static function getBasicUserById($id, $avatar) {
     $fields = self::$returnFields;
-    $sql = "SELECT initials,tag,name,surname,surname_2,avatar_id,private FROM User WHERE id = :id";
+    $sql = "SELECT id,initials,tag,name,surname,surname_2,avatar_id,private FROM User WHERE id = :id";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':id', $id, PDO::PARAM_INT);
     $statement->execute();
@@ -132,6 +142,7 @@ class UserDAO extends DAO {
     return $users;
   }
 
+ 
   public static function saveUser($user, $fiels) {
 
     /* DEFAULT VALUES */
