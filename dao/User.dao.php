@@ -8,6 +8,7 @@ require_once '../controllers/Seniority.controller.php';
 require_once '../controllers/Achievement.controller.php';
 require_once '../controllers/Image.controller.php';
 require_once '../controllers/Token.controller.php';
+require_once '../controllers/User.controller.php';
 
 // Logger
 require_once '../utilities/Logger.php';
@@ -16,15 +17,16 @@ class UserDAO extends DAO {
 
   private static $returnFields = "id, initials, tag, email, name, surname, surname_2, coins, registration_date, points, avatar_id as avatar, private, city_cp as city, province_id as province";
 
-  public static function getUserCompleteData(&$user) {
+  public static function getUserCompleteData(&$user, $lang = null) {
     // Unset name in case of private user
     $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
     if ($user['private']) unset($user['name'], $user['surname'], $user['surname_2'], $user['full_name']);
 
+    $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
+    $user['description'] = UserController::getUserDescription($user, $lang);
     $user['avatar'] = MediaController::getById($user['avatar']) ?? 'sample_avatar';
     $user['address'] =  AddressController::getUserAddress($user);
     $user['achievements'] = AchievementController::getAllByUser($user['id']);
-    $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
     // $user['Seniority'] = SeniorityController::getRange($user);
 
     // Unset not necessary information
@@ -49,9 +51,8 @@ class UserDAO extends DAO {
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':user_id', $user['id'], PDO::PARAM_INT);
     $statement->execute();
-    return $statement->fetch(PDO::FETCH_ASSOC);    
+    return $statement->fetchAll(PDO::FETCH_ASSOC);    
   }
-
 
   public static function getAll() {
     $fields = self::$returnFields;
@@ -59,9 +60,6 @@ class UserDAO extends DAO {
     $statement = self::$DB->prepare($sql);
     $statement->execute();
     $users = $statement->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($users as &$user) {
-      self::getUserCompleteData($user);
-    }
     return $users;
   }
 
