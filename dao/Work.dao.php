@@ -4,18 +4,6 @@ require_once 'DAO.php';
 
 class WorkDAO extends DAO {
 
-  public static function getAllWorksByUser($user_id) {
-    $sql = "SELECT Offer.specialization_id,CONCAT(User.initials,User.tag)AS tag_user ,User.tag,User.initials,Offer.user_id,Offer_Language.language_id,User.name,Offer_Language.title,Offer_Language.description,Offer.personal_valoration,Offer.valoration_avg,Offer.coin_price
-      FROM Offer,Offer_Language,User 
-      WHERE Offer.user_id = Offer_Language.user_id
-      AND Offer.specialization_id = Offer_Language.specialization_id 
-      AND User.id = Offer.user_id
-      AND User.id=$user_id";
-    $statement = self::$DB->prepare($sql);
-    $statement->execute();
-    return $statement->fetchAll(PDO::FETCH_ASSOC);
-  }
-
   public static function getAllWorksByLang($lang) {
     $sql = "SELECT Offer.specialization_id,CONCAT(User.initials,User.tag)AS tag_user ,User.tag,User.initials,Offer.user_id,Offer_Language.language_id,User.name,Offer_Language.title,Offer_Language.description,Offer.personal_valoration,Offer.valoration_avg,Offer.coin_price
       FROM Offer,Offer_Language,User 
@@ -63,6 +51,17 @@ class WorkDAO extends DAO {
       FROM User,Offer 
       WHERE User.id = Offer.user_id";
     $statement = self::$DB->prepare($sql);
+    $statement->execute();
+    return $statement->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  public static function getAllWorksByUser($user_id) {
+    $sql = "SELECT Offer.user_id, Offer.specialization_id, User.initials, User.tag, User.name, User.surname, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg, Offer.visibility 
+      FROM User,Offer 
+      WHERE User.id = Offer.user_id
+      AND User.id = :user_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $statement->execute();
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
