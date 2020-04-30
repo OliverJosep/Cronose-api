@@ -31,9 +31,36 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
     });
   });
 
+  // Users
+  $router->get('/users', function() use ($view, $lang) {
+    $view::json(UserController::getAll($lang)); // Get all users information with a default lang.
+  });
+  $router->get('/user/{initials}/{tag}', function($initial, $tag) use ($view, $lang) {
+    $view::json(UserController::getUserByInitialsAndTag($initial, $tag, $lang)); // Get all user information with a default lang.
+  });
+
   // Work
   $router->get('/work/{initials}/{tag}/{specialization}', function($initials, $tag, $specialization) use ($view, $lang) {
     $view::json(WorkController::getWork($initials, $tag, $specialization, $lang));
+  });
+  $router->mount('/works', function() use ($router, $view, $lang) {
+    $router->get('/', function() use ($view, $lang) {
+      $view::json(WorkController::getAllWorks($lang));
+    });
+    $router->get('/user/{user_id}', function($user_id) use ($view, $lang) {
+      $view::json(WorkController::getAllWorksByUser($user_id, $lang));
+    });  
+    $router->get('/all/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
+      $view::json(WorkController::getWorksDefaultLang($limit, $offset, $lang));
+    });
+    $router->get('/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
+      $view::json(WorkController::getWorksByLang($limit, $offset, $lang));
+    });
+  });
+
+  // Achievements
+  $router->get('/achievements', function() use ($view, $lang) {
+    $view::json(AchievementController::getAllByLang($lang));
   });
 };
 
@@ -86,7 +113,7 @@ $router->mount('/reset_password', function() use ($router, $view) {
 // User
 $router->mount('/users', function() use ($router, $view) {
   $router->get('/', function() use ($view) {
-    $view::json(UserController::getAll()); // Falta la descripció de l'usuari.
+    $view::json(UserController::getAll());
   });
   $router->get('/{search}', function($search) use ($view) {
     $view::json(UserController::getUsersBySearch($search));/***REVISAR***/
@@ -119,100 +146,75 @@ $router->post('/login', function()  use ($view){
 });
 
 // Works
-$router->mount('/work', function() use ($router, $view) {
-  $router->post('/', function() use ($view) {
-    $view::json(WorkController::setNewWork($_REQUEST['data']));
-  });
+$router->post('/work', function() use ($view) {
+  $view::json(WorkController::setNewWork($_REQUEST['data']));
 });
-$router->mount('/works', function() use ($router, $view) {
-  $router->get('/', function() use ($view) {
-    $view::json(WorkController::getAllWorks());
-  });
-  $router->get('/user/{user_id}', function($user_id) use ($view) {
-    $view::json(WorkController::getAllWorksByUser($user_id));
-  });
-  $router->post('/filter', function() use ($view) {
-    $view::json(WorkController::getFilteredWorks($_REQUEST['filter']));
-  });
-  $router->get('/{offset}/{limit}/default/{lang}', function($offset, $limit, $lang) use ($view) {
-    $view::json(WorkController::getWorksDefaultLang($limit, $offset, $lang));
-  });
-  $router->get('/{lang}/{offset}/{limit}', function($lang, $offset, $limit) use ($view) {
-    $view::json(WorkController::getWorksByLang($limit, $offset, $lang));
-  });
-  $router->get('/{offset}/{limit}', function($offset, $limit) use ($view) {
-    $view::json(WorkController::getWorks($limit, $offset));
-  });
+$router->post('/works/filter', function() use ($view) {
+  $view::json(WorkController::getFilteredWorks($_REQUEST['filter']));
 });
 
+// Cards
+$router->mount('/cards', function() use ($router, $view) {
+  $router->get('/{worker_id}/{client_id}/{specialization_id}', function($worker_id, $client_id, $specialization_id) use ($view) {
+    $view::json(WorkDemandController::getAllCards($worker_id, $client_id, $specialization_id));
+  });
+  $router->get('/{user_id}', function($user_id) use ($view) {
+    $view::json(WorkDemandController::getAll($user_id));
+  });
+});
+$router->mount('/card', function() use ($router, $view) {
+  $router->get('/{card_id}', function($card_id) use ($view) {
+    $view::json(WorkDemandController::getCard($card_id));
+  });
+  $router->get('/{status}/{user_id}', function($status, $user_id) use ($view) {
+    $view::json(WorkDemandController::getAllByStatus($user_id, $status));
+  });
+});
+// Demands
+$router->post('/demand', function() use ($view) {
+  $view::json(WorkDemandController::createDemands($_POST['worker_id'], $_POST['client_id'], $_POST['specialization_id']));
+});
 
-// // Cards
-// $router->mount('/cards', function() use ($router, $view) {
-//   $router->get('/{worker_id}/{client_id}/{specialization_id}', function($worker_id, $client_id, $specialization_id) use ($view) {
-//     $view::json(WorkDemandController::getAllCards($worker_id, $client_id, $specialization_id));
-//   });
-//   $router->get('/{user_id}', function($user_id) use ($view) {
-//     $view::json(WorkDemandController::getAll($user_id));
-//   });
-// });
-// $router->mount('/card', function() use ($router, $view) {
-//   $router->get('/{card_id}', function($card_id) use ($view) {
-//     $view::json(WorkDemandController::getCard($card_id));
-//   });
-//   $router->get('/{status}/{user_id}', function($status, $user_id) use ($view) {
-//     $view::json(WorkDemandController::getAllByStatus($user_id, $status));
-//   });
-// });
-// // Demands
-// $router->post('/demand', function() use ($view) {
-//   $view::json(WorkDemandController::createDemands($_POST['worker_id'], $_POST['client_id'], $_POST['specialization_id']));
-// });
+// Chat
+$router->get('/chats/{user_id}', function($user_id) use ($view) {
+  $view::json(ChatController::showChats($user_id));
+});
+$router->mount('/chat', function() use ($router, $view) {
+  $router->get('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
+    $view::json(ChatController::showChat($sender_id, $receiver_id));
+  });
+  $router->post('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
+    ChatController::sendMSG($sender_id, $receiver_id, $_POST['msg']);
+  });
+});
 
-// // Chat
-// $router->get('/chats/{user_id}', function($user_id) use ($view) {
-//   $view::json(ChatController::showChats($user_id));
-// });
-// $router->mount('/chat', function() use ($router, $view) {
-//   $router->get('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
-//     $view::json(ChatController::showChat($sender_id, $receiver_id));
-//   });
-//   $router->post('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
-//     ChatController::sendMSG($sender_id, $receiver_id, $_POST['msg']);
-//   });
-// });
+// Achievements
+$router->get('/achievements', function() use ($view) {
+  $view::json(AchievementController::getAll());
+});
+$router->mount('/achievement', function() use ($router, $view) {
+  $router->get('/{user_id}/{achievement}', function($user_id, $achievement) use ($view) {
+    $view::json(AchievementController::haveAchi($user_id, $achievement));
+  });
+  $router->post('/{user_id}/{achievement}', function($user_id, $achievement) use ($view) {
+    $view::json(AchievementController::setAchievement($user_id, $achievement));
+  });
+});
 
-// // Achievements
-// $router->mount('/achievements', function() use ($router, $view) {
-//   $router->get('/', function() use ($view) {
-//     $view::json(AchievementController::getAll());
-//   });
-//   $router->get('/{lang}', function($lang) use ($view) {
-//     $view::json(AchievementController::getAllByLang($lang));
-//   });
-// });
-// $router->mount('/achievement', function() use ($router, $view) {
-//   $router->get('/{user_id}/{achievement}', function($user_id, $achievement) use ($view) {
-//     $view::json(AchievementController::haveAchi($user_id, $achievement));
-//   });
-//   $router->post('/{user_id}/{achievement}', function($user_id, $achievement) use ($view) {
-//     $view::json(AchievementController::setAchievement($user_id, $achievement));
-//   });
-// });
+// Seniority
+$router->mount('/seniority', function() use ($router, $view) {
+  $router->get('/range/{user_id}', function($user_id) use ($view) {
+    $view::json(SeniorityController::getRange($user_id));
+  });
+  $router->get('/{user_id}', function($user_id) use ($view) {
+    $view::json(SeniorityController::getVet($user_id));
+  });
+});
 
-// // Seniority
-// $router->mount('/seniority', function() use ($router, $view) {
-//   $router->get('/range/{user_id}', function($user_id) use ($view) {
-//     $view::json(SeniorityController::getRange($user_id));
-//   });
-//   $router->get('/{user_id}', function($user_id) use ($view) {
-//     $view::json(SeniorityController::getVet($user_id));
-//   });
-// });
-
-// // Valoration
-// $router->get('/valorations/{user_id}/{specialization_id}', function($user_id, $specialization_id) use ($view) {
-//   $view::json(ValorationController::getWorkerValorations($user_id, $specialization_id));
-// });
+// Valoration
+$router->get('/valorations/{user_id}/{specialization_id}', function($user_id, $specialization_id) use ($view) {
+  $view::json(ValorationController::getWorkerValorations($user_id, $specialization_id));
+});
 
 // Error 404
 $router->set404(function() {
