@@ -30,20 +30,20 @@ class UserDAO extends DAO {
     // $user['Seniority'] = SeniorityController::getRange($user);
 
     // Unset not necessary information
-    unset($user['city'], $user['province'], $user['private'], $user['password'], $user['validated']);
+    unset($user['city'], $user['email'], $user['province'], $user['private'], $user['password'], $user['validated']);
     return $user;
   }
 
-  private static function getUserBasicData(&$user, $avatar) {
+  private static function getUserBasicData(&$user, $lang, $avatar) {
     // Unset name in case of private user
     $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
-    $user['description'] = self::getUserDescription($user);
+    $user['description'] = UserController::getUserDescription($user, $lang);
     if ($user['private']) unset($user['name'], $user['surname'], $user['surname_2'], $user['full_name']);
 
     if ($avatar) $user['avatar'] = MediaController::getById($user['avatar_id']);
 
     // Unset not necessary information
-    unset($user['id'], $user['avatar_id'], $user['private']);
+    unset($user['id'], $user['email'] ,$user['avatar_id'], $user['private']);
   }
 
   public static function getUserDescription($user) {
@@ -115,14 +115,14 @@ class UserDAO extends DAO {
     return $password;
   }
 
-  public static function getBasicUserById($id, $avatar) {
+  public static function getBasicUserById($id, $lang, $avatar) {
     $fields = self::$returnFields;
     $sql = "SELECT id,initials,tag,name,surname,surname_2,avatar_id,private FROM User WHERE id = :id";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':id', $id, PDO::PARAM_INT);
     $statement->execute();
     $user = $statement->fetch(PDO::FETCH_ASSOC);
-    self::getUserBasicData($user, $avatar);
+    self::getUserBasicData($user, $lang, $avatar);
     return $user;
   }
 

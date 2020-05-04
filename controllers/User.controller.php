@@ -39,12 +39,13 @@ class UserController {
     return UserDAO::getAllWorksByUser($user_id);
   }
 
-  public static function getBasicUserById($id, $avatar = false) {
-    return UserDAO::getBasicUserById($id, $avatar);
+  public static function getBasicUserById($id, $lang, $avatar = false) {
+    return UserDAO::getBasicUserById($id, $lang, $avatar);
   }
 
   public static function getUserDescription($user, $lang) {
     $user['description'] = UserDAO::getUserDescription($user);
+    if (!isset($user['description'][0])) return null;
     if ($lang) $user['description'] = Language::orderByLang($lang, $user['description']);
     return $user['description'];
   }
