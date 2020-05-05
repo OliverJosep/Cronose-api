@@ -178,6 +178,7 @@ $router->post('/demand', function() use ($view) {
 // Chat
 $router->get('/chats/{user_id}', function($user_id) use ($view) {
   $view::json(ChatController::showChats($user_id));
+  // ChatControkller::showChats($user_id);
 });
 $router->mount('/chat', function() use ($router, $view) {
   $router->get('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {

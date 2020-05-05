@@ -24,9 +24,19 @@ class ChatController {
 
   public static function showChats($sender) {
     $chats = ChatDAO::showChats($sender);
-    // foreach ($chats as &$chat) {
-    //   $chat['last'] = ChatDAO::getLastMessage($sender, $chat['receiver_id']);
-    // }
+    foreach ($chats as $value => $key) {
+      foreach ($chats as $val){
+        if ($val["sender_id"] == $key["receiver_id"] && $val["receiver_id"] == $key["sender_id"]) {
+          unset($chats[$value]);
+        }
+      }
+    }
+    
+    foreach ($chats as &$user) {
+      $user['reciver'] = ($sender === $user["sender_id"]) ? ChatDAO::getUserData($user["receiver_id"]) : ChatDAO::getUserData($user["sender_id"]) ;
+      $user['last'] = ChatDAO::getLastMessage($user["sender_id"],$user["receiver_id"]);
+    }
+    $chats = array('user' => UserController::getBasicUserById($sender, false, true)) + $chats;
     return $chats;
   }
 

@@ -48,8 +48,7 @@ class ChatDAO extends DAO {
   }
 
   public static function showChats($user_id) {
-
-    $sql = "SELECT Message.sender_id, Message.receiver_id FROM Message WHERE Message.sender_id = 1 OR Message.receiver_id = 1 group by sender_id, receiver_id";
+    $sql = "select distinct sender_id, receiver_id from Message where receiver_id = :user_id or sender_id = :user_id";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $statement->execute();
@@ -57,13 +56,10 @@ class ChatDAO extends DAO {
   }
 
   public static function getLastMessage($sender, $receiver) {
-    // return $sender;
-    $sql = "SELECT (select COUNT(*) > 0 from User where sender_id = :sender) AS sended,sended_date,message 
-            FROM Message 
-            WHERE (sender_id = :sender AND receiver_id = :receiver) 
-            OR (sender_id = :receiver AND receiver_id = :sender) 
-            AND satus = 'pending'
-            ORDER BY sended_date DESC limit 1;";
+    $sql = "SELECT (SELECT COUNT(*) > 0 FROM User WHERE sender_id = 1) AS sended, Message.message, Message.sended_date 
+            FROM Message WHERE (sender_id = :sender AND receiver_id = :receiver) 
+            OR (receiver_id = :sender AND sender_id = :receiver) 
+            ORDER BY sended_date DESC LIMIT 1";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':sender', $sender, PDO::PARAM_INT);
     $statement->bindParam(':receiver', $receiver, PDO::PARAM_INT);

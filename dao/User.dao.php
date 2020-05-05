@@ -43,7 +43,7 @@ class UserDAO extends DAO {
     if ($avatar) $user['avatar'] = MediaController::getById($user['avatar_id']);
 
     // Unset not necessary information
-    unset($user['id'], $user['email'] ,$user['avatar_id'], $user['private']);
+    unset( $user['email'] ,$user['avatar_id'], $user['private']);
   }
 
   public static function getUserDescription($user) {
