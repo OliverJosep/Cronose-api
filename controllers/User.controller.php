@@ -39,7 +39,7 @@ class UserController {
     return UserDAO::getAllWorksByUser($user_id);
   }
 
-  public static function getBasicUserById($id, $lang, $avatar = false) {
+  public static function getBasicUserById($id, $lang = false, $avatar = false) {
     return UserDAO::getBasicUserById($id, $lang, $avatar);
   }
 

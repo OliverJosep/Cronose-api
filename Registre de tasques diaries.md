@@ -1,10 +1,20 @@
 
+## 05/05/2020
+- **React**
+	- Actulització del loader (1 hora).
+- **Diseny**
+	- Actualització del width de quan esta logueat. (Completat, 0.5 hores)
+	- Actualització del filtre del mercat (Completat, 1.5 hores)
+- **Controladors**
+	- Actualització i revisió de la base de dades, chat(Completat, 1 hora)
+	- Actualització i reserca de com fer el controlador del chat.(En proces 4 hores)
+
 ## 04/05/2020
 - **React**
 	- Visualització de tots els perfils (Completat, 2 hora).
 	- Revisió i actualització de les rutes de la API (Casi acabat, 1 hora).
 	- Actualització i fusió del LocalStorage amb el LoginStorage (Completat, 2 hores).
-	- Implementar un loader funcional. (Completat, 2 hores)
+	- Implementar un loader funcional. (Completat, 2 hores).
 
 ## 02/05/2020 - 03/05/2020
 - **React**
