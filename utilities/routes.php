@@ -181,11 +181,14 @@ $router->get('/chats/{user_id}', function($user_id) use ($view) {
   // ChatControkller::showChats($user_id);
 });
 $router->mount('/chat', function() use ($router, $view) {
+  $router->get('/last/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
+    $view::json(ChatController::showChat($sender_id, $receiver_id, 0, 2, false));
+  });
   $router->get('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
     $view::json(ChatController::showChat($sender_id, $receiver_id));
   });
   $router->post('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
-    ChatController::sendMSG($sender_id, $receiver_id, $_POST['msg']);
+    ChatController::sendMSG($sender_id, $receiver_id, $_POST['message']);
   });
 });
 

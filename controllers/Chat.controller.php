@@ -10,8 +10,10 @@ class ChatController {
     return ChatDAO::showAllChat($sender, $receiver);
   }
 
-  public static function showChat($sender, $receiver, $offset = 0, $limit = 25) {
-    return ChatDAO::showChat($sender, $receiver, $offset, $limit);
+  public static function showChat($sender, $receiver, $offset = 0, $limit = 25, $user = true) {
+    $chat = ChatDAO::showChat($sender, $receiver, $offset, $limit, $user);
+    $chat['messages'] = array_reverse($chat['messages']);
+    return $chat;
   }
 
   public static function sendMSG($sender, $receiver, $msg) {
@@ -39,7 +41,7 @@ class ChatController {
       unset($user["sender_id"], $user["receiver_id"]);
     }
     $chats = self::sortLastMessage($chats);
-    $chats = array('user' => UserController::getBasicUserById($sender, false, true)) + $chats;
+    $chats = array('user' => UserController::getBasicUserById($sender, false, true)) + array('chats' => $chats);
     return $chats;
   }
 

@@ -20,9 +20,9 @@ class ChatDAO extends DAO {
     return $chat;
   }
 
-  public static function showChat($sender, $receiver, $offset, $limit) {
-    $chat['sender'] = self::getUserData($sender);
-    $chat['receiver'] = self::getUserData($receiver);
+  public static function showChat($sender, $receiver, $offset, $limit, $user) {
+    if ($user) $chat['sender'] = self::getUserData($sender);
+    if ($user) $chat['receiver'] = self::getUserData($receiver);
     $sql = "SELECT (select COUNT(*) > 0 from User where sender_id = id and id = :sender) as sended,sended_date,message 
             FROM Message 
             WHERE (sender_id = :sender AND receiver_id = :receiver) OR (sender_id = :receiver AND receiver_id = :sender) 
@@ -39,7 +39,7 @@ class ChatDAO extends DAO {
   }
 
   public static function sendMSG($sender, $receiver, $msg) {
-    $sql = "INSERT INTO Message VALUE(:sender, :receiver, now(), :msg);";
+    $sql = "INSERT INTO Message VALUE(:sender, :receiver, now(), :msg, 'pending');";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':sender', $sender, PDO::PARAM_INT);
     $statement->bindParam(':receiver', $receiver, PDO::PARAM_INT);
