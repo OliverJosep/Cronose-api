@@ -56,7 +56,7 @@ class ChatDAO extends DAO {
   }
 
   public static function getLastMessage($sender, $receiver) {
-    $sql = "SELECT (SELECT COUNT(*) > 0 FROM User WHERE sender_id = 1) AS sended, Message.message, Message.sended_date 
+    $sql = "SELECT (SELECT COUNT(*) > 0 FROM User WHERE sender_id = :sender) AS sended, Message.message, Message.sended_date, Message.satus
             FROM Message WHERE (sender_id = :sender AND receiver_id = :receiver) 
             OR (receiver_id = :sender AND sender_id = :receiver) 
             ORDER BY sended_date DESC LIMIT 1";

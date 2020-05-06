@@ -1,13 +1,19 @@
 
+## 06/05/2020
+- **Controladors**
+	- Visualització de tots els chats de un usuari ordenats per data. (Completat, 2.5 hores)
+	- Xarla tutor. (0.5 hores)
+
 ## 05/05/2020
 - **React**
 	- Actulització del loader (1 hora).
 - **Diseny**
 	- Actualització del width de quan esta logueat. (Completat, 0.5 hores)
-	- Actualització del filtre del mercat (Completat, 1.5 hores)
+	- Actualització del filtre del mercat. (Completat, 1.5 hores)
 - **Controladors**
-	- Actualització i revisió de la base de dades, chat(Completat, 1 hora)
-	- Actualització i reserca de com fer el controlador del chat.(En proces 4 hores)
+	- Actualització i revisió de la base de dades, chat.(Completat, 1 hora)
+	- Actualització i reserca de com fer el controlador del chat.(En proces, 2 hores)
+	- Actualització del controlador chat (Poder visualitzar tots els chat inicialitzats amb un altre persona) (En procés. 2 hores)
 
 ## 04/05/2020
 - **React**

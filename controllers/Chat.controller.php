@@ -31,13 +31,34 @@ class ChatController {
         }
       }
     }
+    $chats = array_values($chats);
     
     foreach ($chats as &$user) {
       $user['reciver'] = ($sender === $user["sender_id"]) ? ChatDAO::getUserData($user["receiver_id"]) : ChatDAO::getUserData($user["sender_id"]) ;
-      $user['last'] = ChatDAO::getLastMessage($user["sender_id"],$user["receiver_id"]);
+      $user['last'] = ChatDAO::getLastMessage($sender,$user["reciver"]['id']);
+      unset($user["sender_id"], $user["receiver_id"]);
     }
+    $chats = self::sortLastMessage($chats);
     $chats = array('user' => UserController::getBasicUserById($sender, false, true)) + $chats;
     return $chats;
   }
+
+  public static function sortLastMessage($chats) {
+    do {
+      for ($i = 0; $i < count($chats) - 1; $i++) {
+        $sorted = false;
+        $date1 = explode(' ', $chats[$i]['last']['sended_date']);
+        $date2 = explode(' ', $chats[$i+1]['last']['sended_date']);
+        if (strtotime($date1[0]) < strtotime($date2[0]) || ($date1[0] === $date2[0] && $date1[1] < $date2[1]) ){
+          $aux = $chats[$i];
+          $chats[$i] = $chats[$i+1];
+          $chats[$i+1] = $aux;
+          $sorted = true;
+        }
+      };
+    } while ($sorted);
+    return $chats;
+  }
+  
 
 }
