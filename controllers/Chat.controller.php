@@ -46,21 +46,18 @@ class ChatController {
   }
 
   public static function sortLastMessage($chats) {
-    do {
+    for ($e = 0; $e < count($chats); $e++) {
       for ($i = 0; $i < count($chats) - 1; $i++) {
-        $sorted = false;
         $date1 = explode(' ', $chats[$i]['last']['sended_date']);
         $date2 = explode(' ', $chats[$i+1]['last']['sended_date']);
         if (strtotime($date1[0]) < strtotime($date2[0]) || ($date1[0] === $date2[0] && $date1[1] < $date2[1]) ){
           $aux = $chats[$i];
           $chats[$i] = $chats[$i+1];
           $chats[$i+1] = $aux;
-          $sorted = true;
         }
       };
-    } while ($sorted);
+    };
     return $chats;
   }
-  
 
 }
