@@ -188,7 +188,8 @@ $router->mount('/chat', function() use ($router, $view) {
     $view::json(ChatController::showChat($sender_id, $receiver_id));
   });
   $router->post('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
-    ChatController::sendMSG($sender_id, $receiver_id, $_POST['message']);
+    ChatController::sendMSG($sender_id, $receiver_id, $_POST['message'], $_POST['sended_date']);
+    // var_dump($_POST);
   });
 });
 

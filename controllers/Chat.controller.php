@@ -16,8 +16,8 @@ class ChatController {
     return $chat;
   }
 
-  public static function sendMSG($sender, $receiver, $msg) {
-    ChatDAO::sendMSG($sender, $receiver, $msg);
+  public static function sendMSG($sender, $receiver, $msg, $date = null) {
+    ChatDAO::sendMSG($sender, $receiver, $msg, $date);
     $achi_id = 2;
     if ( !AchievementController::haveAchi($sender, $achi_id) ) {
       AchievementController::setAchievement($sender, $achi_id);

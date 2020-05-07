@@ -38,7 +38,7 @@ class ChatDAO extends DAO {
     return $chat;
   }
 
-  public static function sendMSG($sender, $receiver, $msg) {
+  public static function sendMSG($sender, $receiver, $msg, $date) {
     $sql = "INSERT INTO Message VALUE(:sender, :receiver, now(), :msg, 'pending');";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':sender', $sender, PDO::PARAM_INT);

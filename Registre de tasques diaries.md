@@ -1,8 +1,15 @@
+## 07/05/2020
+- **React**
+	- Enviar missatges, actualitzar missatges, actualització dels missatges (Completat, 4 hores)
+	- Actualització dels chats que hi ha de un usuari (Pendent).
 
 ## 06/05/2020
+- Xarla tutor. (0.5 hores)
 - **Controladors**
 	- Visualització de tots els chats de un usuari ordenats per data. (Completat, 2.5 hores)
-	- Xarla tutor. (0.5 hores)
+- **React**
+	- Implementació de la visualització dels chats (Completat, 2 hores)
+	- Obtenir els misatges de un chat (Completat, 3 hores)
 
 ## 05/05/2020
 - **React**
