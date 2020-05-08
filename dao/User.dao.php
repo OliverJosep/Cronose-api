@@ -142,9 +142,10 @@ class UserDAO extends DAO {
 
  
   public static function saveUser($user, $fiels) {
+    // return $user;
 
     /* DEFAULT VALUES */
-    $surname = ucfirst($user['surname_2']) ?? "";
+    $surname_2 = ucfirst($user['surname_2']) ?? "";
     $user['private'] = (isset($user['private'])) ? 1 : 0;
     $user['avatar'] = $user['avatar'] ?? 'null';
     /* SAVE FILES */
