@@ -106,8 +106,14 @@ $router->mount('/reset_password', function() use ($router, $view) {
     TokenController::generateResetPassword($email);
   });
   $router->post('/', function() use ($view) {
+    $view::json(UserController::updatePassword($_POST));
+  });
+  $router->post('/token', function() use ($view) {
     $view::json(TokenController::resetPassword($_POST['password'], $_POST['token']));
   });
+});
+$router->get('/password/{user_id}', function($user_id) use ($view) {
+  $view::json(UserController::getPassword($user_id));
 });
 
 // User
@@ -120,11 +126,26 @@ $router->mount('/users', function() use ($router, $view) {
   });
 });
 $router->mount('/user', function() use ($router, $view) {
+  $router->get('/id/{id}', function($id) use ($view) {
+    $view::json(UserController::getUserById($id));
+  });
+  $router->get('/description/{id}', function($user_id) use ($view) {
+    $view::json(UserController::getUserDescription($user_id));
+  });
+  $router->post('/description', function() use ($view) {
+    echo json_encode(UserController::updateDescription($_POST));
+  });
   $router->get('/{initials}/{tag}/id', function($initial, $tag) use ($view) {
     $view::json(UserController::getId($initial, $tag));
   });
   $router->get('/{initials}/{tag}', function($initial, $tag) use ($view) {
     $view::json(UserController::getUserByInitialsAndTag($initial, $tag)); // Falta la descripció de l'usuari.
+  });
+  $router->post('/update/description', function() {
+    // echo json_encode(UserController::updateData($_POST));
+  });
+  $router->post('/update', function() {
+    echo json_encode(UserController::updateData($_POST));
   });
 });
 

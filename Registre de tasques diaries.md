@@ -1,8 +1,17 @@
+https://docs.google.com/spreadsheets/d/1XMS2keKCSKBmpjJ8LYsQUv0iLxzJ9oCP35hru45wcXs/edit?usp=sharing
+
+
+## 08/05/2020
+- **Controladors**
+	- Arreglat un error a l'hora de registrar-se. (Completat, 0.5 hores)
+- **React**
+	- Actualització de tots els chat en ordre. (Completat, 1.5 hores)
+
 ## 07/05/2020
 - **React**
 	- Enviar missatges, actualitzar missatges, actualització dels missatges (Completat, 4 hores)
 	- Actualització dels chats que hi ha de un usuari (En procés, 2 hores).
-		- Actualització de tots els chat en ordre (En procés, 1.5 hores)
+		- Actualització de tots els chat en ordre (En procés, 1.5 hores).
 
 ## 06/05/2020
 - Xarla tutor. (0.5 hores)

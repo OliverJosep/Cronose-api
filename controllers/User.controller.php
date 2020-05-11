@@ -43,11 +43,41 @@ class UserController {
     return UserDAO::getBasicUserById($id, $lang, $avatar);
   }
 
-  public static function getUserDescription($user, $lang) {
-    $user['description'] = UserDAO::getUserDescription($user);
+  public static function getUserDescription($user, $lang = null) {
+    if (!is_array($user)) return self::getAllDescriptions($user);
+
+    $user['description'] = UserDAO::getUserDescription($user['id']);
     if (!isset($user['description'][0])) return null;
     if ($lang) $user['description'] = Language::orderByLang($lang, $user['description']);
     return $user['description'];
+  }
+
+  public static function getAllDescriptions($user) {
+    $descriptions = UserDAO::getUserDescription($user);
+    if (count($descriptions) == 3) return $descriptions;
+    $langs = [
+      0 => 'es', 
+      1 => 'en', 
+      2 => 'ca'
+    ];
+    foreach ($langs as $key => $value) {
+      foreach ($descriptions as $description) {
+        if ($value === $description['language_id']) unset($langs[$key]);
+      }
+      if (isset($langs[$key])) array_push($descriptions, ['language_id' => $value, 'description' => '']);
+    }
+    return $descriptions;
+  }
+
+  public static function updateDescription($data) {
+    $user_id = $data['user_id'];
+    unset($data['user_id']);
+    foreach ($data as $key => $value) {
+      $description = UserDAO::getDescription($user_id, $key);
+      if ($description['description'] != $value) UserDAO::updateDescription($user_id, $value, $key);
+      if (!$description['description'] && $value != "") UserDAO::insertDescription($user_id, $value, $key);
+      if ($value === "") UserDAO::deleteDescription($user_id, $key);
+    }
   }
 
   public static function getAllDirections() {
@@ -86,8 +116,22 @@ class UserController {
     UserDAO::validateUser($token);
   }
 
-  public static function resetPassword($token, $password) {
-    return UserDao::resetPassword($token, $password);
+  public static function resetPasswordToken($token, $password) {
+    return UserDAO::resetPasswordToken($token, $password);
+  }
+
+  public static function updateData($data) {
+    $private = isset($data['private']) ? true : false;
+    UserDAO::updateUser($data['email'], $data['city_cp'], $private, $data['user_id']);
+    return $data;
+  }
+
+  public static function updatePassword($data) {
+    return UserDAO::updatePassword($data['password'], $data['user_id']);
+  }
+
+  public static function getPassword($user_id) {
+    return UserDAO::getPasswordByID($user_id);
   }
 
 }

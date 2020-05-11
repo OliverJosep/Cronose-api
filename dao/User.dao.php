@@ -22,7 +22,7 @@ class UserDAO extends DAO {
     $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
     if ($user['private']) unset($user['name'], $user['surname'], $user['surname_2'], $user['full_name']);
 
-    $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
+    if (!$user['private']) $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
     $user['description'] = UserController::getUserDescription($user, $lang);
     $user['avatar'] = MediaController::getById($user['avatar']) ?? 'sample_avatar';
     $user['address'] =  AddressController::getUserAddress($user);
@@ -30,7 +30,7 @@ class UserDAO extends DAO {
     // $user['Seniority'] = SeniorityController::getRange($user);
 
     // Unset not necessary information
-    unset($user['city'], $user['email'], $user['province'], $user['private'], $user['password'], $user['validated']);
+    unset($user['city'], $user['province'], $user['password'], $user['validated']);
     return $user;
   }
 
@@ -46,10 +46,10 @@ class UserDAO extends DAO {
     unset( $user['email'] ,$user['avatar_id'], $user['private']);
   }
 
-  public static function getUserDescription($user) {
+  public static function getUserDescription($user_id) {
     $sql = "SELECT language_id, description FROM User_Language WHERE user_id = :user_id ";
     $statement = self::$DB->prepare($sql);
-    $statement->bindParam(':user_id', $user['id'], PDO::PARAM_INT);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $statement->execute();
     return $statement->fetchAll(PDO::FETCH_ASSOC);    
   }
@@ -99,6 +99,17 @@ class UserDAO extends DAO {
     $sql = "SELECT ${fields}, password FROM User WHERE email = :email";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->execute();
+    $user = $statement->fetch(PDO::FETCH_ASSOC);
+    self::getUserCompleteData($user);
+    return $user;
+  }
+
+  public static function getUserById($id) {
+    $fields = self::$returnFields;
+    $sql = "SELECT ${fields} FROM User WHERE id = :id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':id', $id, PDO::PARAM_INT);
     $statement->execute();
     $user = $statement->fetch(PDO::FETCH_ASSOC);
     self::getUserCompleteData($user);
@@ -199,14 +210,6 @@ class UserDAO extends DAO {
     $statement->execute();
   }
 
-  public static function getUserById($user_id) {
-    $sql = "SELECT * FROM User where id = :user_id;";
-    $statement = self::$DB->prepare($sql);
-    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-    $statement->execute();
-    return $statement->fetch(PDO::FETCH_ASSOC);
-  }
-
   public static function getIdByEmail($email) {
     $sql = "SELECT id FROM User WHERE email = :email;";
     $statement = self::$DB->prepare($sql);
@@ -215,7 +218,7 @@ class UserDAO extends DAO {
     return $statement->fetch(PDO::FETCH_ASSOC);
   }
 
-  public static function resetPassword($password, $token) {
+  public static function resetPasswordToken($password, $token) {
     $sql = "UPDATE User,Token 
             SET User.password = :password
             WHERE User.id = Token.user_id 
@@ -225,5 +228,72 @@ class UserDAO extends DAO {
     $statement->bindParam(':token', $token, PDO::PARAM_STR);
     $statement->execute();
   }
+
+  public static function updatePassword($password, $user_id) {
+    $sql = "UPDATE User
+            SET password = :password
+            WHERE id = :user_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':password', $password, PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  public static function getPasswordByID($user_id) {
+    $sql = "SELECT password FROM User WHERE id = :user_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public static function updateUser($email, $city_cp, $private, $user_id) {
+    $sql = "UPDATE User 
+            SET email = :email, city_cp = :city_cp, private = :private 
+            WHERE User.id = :user_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->bindParam(':city_cp', $city_cp, PDO::PARAM_INT);
+    $statement->bindParam(':private', $private, PDO::PARAM_INT);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->execute();
+  }
+
+  public static function getDescription($user_id, $lang) {
+    $sql = "SELECT description FROM User_Language WHERE user_id = :user_id AND language_id = :lang";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public static function insertDescription($user_id, $description, $lang) {
+    $sql = "INSERT INTO User_Language(language_id, user_id, description) VALUES(:lang, :user_id, :description)";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':description', $description, PDO::PARAM_STR);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  public static function updateDescription($user_id, $description, $lang) {
+    $sql = "UPDATE User_Language SET description = :description WHERE user_id = :user_id AND language_id = :lang";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':description', $description, PDO::PARAM_STR);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  public static function deleteDescription($user_id, $lang) {
+    $sql = "DELETE FROM User_Language WHERE user_id = :user_id AND language_id = :lang";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  
 
 }

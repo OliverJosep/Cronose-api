@@ -24,9 +24,9 @@ class TokenController {
     self::sendToken($userId['id'], $email, $subject, $message, $title);
   }
 
-  public static function resetPassword($password, $token) {
+  public static function resetPasswordToken($password, $token) {
 
-    UserController::resetPassword($password, $token);
+    UserController::resetPasswordToken($password, $token);
     self::deleteToken($token);
 
   }
