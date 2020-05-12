@@ -48,4 +48,17 @@ class SpecializationDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  public static function getByLang($lang, $specialization_id) {
+    $sql = "SELECT name
+      FROM Specialization, Specialization_Language
+      WHERE Specialization.id = Specialization_Language.specialization_id
+      AND Specialization.id = :specialization_id
+      AND language_id = :lang";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
 }

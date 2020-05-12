@@ -133,4 +133,16 @@ class WorkController {
     return $translations;
   }
 // -----------------------------------------------------
+
+  public static function getVisibility($data) {
+    return WorkDAO::getVisibility($data['user_id'], $data['specialization_id']);
+  }
+
+  public static function updateVisibility($data) {
+    $isVisible = self::getVisibility($data)['visibility'];
+    $visible = (isset($data['visible'])) ? '1' : '0';
+    if ($isVisible === $visible) return 'Equals';
+    return WorkDAO::updateVisibility($data['user_id'], $data['specialization_id'], $visible);
+  }
+
 }

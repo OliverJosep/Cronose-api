@@ -20,14 +20,17 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
   $router->get('/categories', function() use ($view, $lang) {
     $view::json(CategoryController::getAllByLang($lang));
   });
+  $router->get('/category/{category_id}', function($category_id) use ($view, $lang) {
+    $view::json(SpecializationController::getByLangAndCategory($lang, $category_id));
+  });
 
   // Specializations
   $router->mount('/specialization', function() use ($router, $view, $lang) {
     $router->get('/', function() use ($view, $lang) {
       $view::json(SpecializationController::getAllByLang($lang));
     });
-    $router->get('/{category_id}', function($category_id) use ($view, $lang) {
-      $view::json(SpecializationController::getByLangAndCategory($lang, $category_id));
+    $router->get('/{specialization_id}', function($specialization_id) use ($view, $lang) {
+      $view::json(SpecializationController::getByLang($lang, $specialization_id));
     });
   });
 
@@ -177,6 +180,12 @@ $router->mount('/work', function() use ($router, $view) {
   });
   $router->post('/translations', function() use ($view) {
     $view::json(WorkController::updateTranslations($_POST));
+  });
+  $router->get('/visible', function() use ($view) {
+    $view::json(WorkController::getVisibility($_GET));
+  });
+  $router->post('/switch', function() use ($view) {
+    $view::json(WorkController::updateVisibility($_POST));
   });
 });
 $router->post('/works/filter', function() use ($view) {

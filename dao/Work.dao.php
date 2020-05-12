@@ -205,4 +205,24 @@ class WorkDAO extends DAO {
     $statement->bindParam(':description', $description, PDO::PARAM_STR);
     return $statement->execute();
   }
+
+  public static function getVisibility($user_id, $specialization_id) {
+    $sql = "SELECT visibility FROM Offer 
+            WHERE user_id = :user_id AND specialization_id = :specialization_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);    
+  }
+
+  public static function updateVisibility($user_id, $specialization_id, $visibility){
+    $sql = "UPDATE Offer SET visibility = :visibility 
+            WHERE user_id = :user_id AND specialization_id = :specialization_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
+    $statement->bindParam(':visibility', $visibility, PDO::PARAM_INT);
+    return $statement->execute();
+  }
 }
