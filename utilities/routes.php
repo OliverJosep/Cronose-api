@@ -43,6 +43,9 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
   $router->get('/work/{initials}/{tag}/{specialization}', function($initials, $tag, $specialization) use ($view, $lang) {
     $view::json(WorkController::getWork($initials, $tag, $specialization, $lang));
   });
+  $router->post('/work', function() use ($view, $lang) {
+    $view::json(WorkController::setNewWork($lang, $_REQUEST['data']));
+  });
   $router->mount('/works', function() use ($router, $view, $lang) {
     $router->get('/', function() use ($view, $lang) {
       $view::json(WorkController::getAllWorks($lang));
@@ -167,8 +170,14 @@ $router->post('/login', function()  use ($view){
 });
 
 // Works
-$router->post('/work', function() use ($view) {
-  $view::json(WorkController::setNewWork($_REQUEST['data']));
+
+$router->mount('/work', function() use ($router, $view) {
+  $router->get('/translations', function() use ($view) {
+    $view::json(WorkController::getTranslations($_GET));
+  });
+  $router->post('/translations', function() use ($view) {
+    $view::json(WorkController::updateTranslations($_POST));
+  });
 });
 $router->post('/works/filter', function() use ($view) {
   $view::json(WorkController::getFilteredWorks($_REQUEST['filter']));

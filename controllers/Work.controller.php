@@ -93,9 +93,9 @@ class WorkController {
     return $work;
   }
 
-  public static function setNewWork($data){
+  public static function setNewWork($lang, $data){
     WorkDAO::setNewWork($data);
-    WorkDAO::setNewWorkLang($data);
+    WorkDAO::setNewWorkLang($lang, $data);
   }
 
   public static function getNewWork(){
@@ -108,5 +108,29 @@ class WorkController {
     return WorkDAO::getWorkLangs($user_id, $specialization_id);
   }
 
+  public static function getTranslations($data) {
+    $translations = self::getWorkLangs($data['user_id'], $data['specialization_id']);
+    if (count($translations) == 0) return null;
+    if (count($translations) == 3) return $translations;
+    $langs = [
+      0 => 'es', 
+      1 => 'en', 
+      2 => 'ca'
+    ];
+    foreach ($langs as $key => $value) {
+      foreach ($translations as $translation) {
+        if ($value === $translation['language_id']) unset($langs[$key]);
+      }
+      if (isset($langs[$key])) array_push($translations, ['language_id' => $value, 'title' => '', 'description' => '']);
+    }
+    return $translations;
+  }
+
+  public static function updateTranslations($data) {
+    $translations = WorkDAO::getTranslation($data['user_id'], $data['specialization_id'], $data['lang']);
+    if (!$translations && $data['title'] != '') return WorkDAO::insertTranslation($data['user_id'], $data['specialization_id'], $data['lang'], $data['title'], $data['description']);
+    if ($translations['title'] != $data['title'] || $translations['title'] != $data['description']) return WorkDAO::updateTranslation($data['user_id'], $data['specialization_id'], $data['lang'], $data['title'], $data['description']);
+    return $translations;
+  }
 // -----------------------------------------------------
 }

@@ -149,10 +149,11 @@ class WorkDAO extends DAO {
     $statement->execute();
   }
 
-  public static function setNewWorkLang($data){
+  public static function setNewWorkLang($lang, $data){
     $sql = "INSERT INTO `Offer_Language` (`language_id`, `user_id`, `specialization_id`, `title`, `description`) VALUES 
-            ('ca', :user_id, :specialization_id, :workTitle, :workDescription)";
+            (:lang, :user_id, :specialization_id, :workTitle, :workDescription)";
     $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
     $statement->bindParam(':user_id', $data['user_id'], PDO::PARAM_INT);
     $statement->bindParam(':specialization_id', $data['specialization_id'], PDO::PARAM_INT);
     $statement->bindParam(':workTitle', $data['workTitle'], PDO::PARAM_STR);
@@ -165,5 +166,43 @@ class WorkDAO extends DAO {
     $statement = self::$DB->prepare($sql);
     $statement->execute();
     return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
+  // Translations
+
+  public static function getTranslation($user_id, $specialization_id, $lang){
+    $sql = "SELECT title, description FROM Offer_Language WHERE user_id = :user_id AND specialization_id = :specialization_id AND language_id = :lang";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public static function insertTranslation($user_id, $specialization_id, $lang, $title, $description){
+    $sql = "INSERT INTO Offer_Language(language_id, user_id, specialization_id, title, description) 
+            VALUES(:lang, :user_id, :specialization_id, :title, :description)";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    $statement->bindParam(':title', $title, PDO::PARAM_STR);
+    $statement->bindParam(':description', $description, PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  public static function updateTranslation($user_id, $specialization_id, $lang, $title, $description){
+    $sql = "UPDATE Offer_Language SET title = :title, description = :description 
+            WHERE user_id = :user_id 
+            AND specialization_id = :specialization_id
+            AND language_id = :lang";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    $statement->bindParam(':title', $title, PDO::PARAM_STR);
+    $statement->bindParam(':description', $description, PDO::PARAM_STR);
+    return $statement->execute();
   }
 }
