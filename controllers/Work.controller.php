@@ -22,7 +22,7 @@ class WorkController {
   public static function getAllWorksByUser($user_id, $lang) {
     $works = WorkDAO::getAllWorksByUser($user_id);
     foreach ($works as $key => $value) {
-      $works[$key]['user'] = UserController::getBasicUserById($value['user_id']);
+      $works[$key]['user'] = UserController::getBasicUserById($value['user_id'], false, true);
       $works[$key]['translations'] = self::getWorkLangs($value['user_id'], $value['specialization_id']);
       unset($works[$key]['user_id']);
     }
@@ -50,7 +50,7 @@ class WorkController {
     $works = WorkDAO::getWorks($limit, $offset);
 
     foreach ($works as $key => $value) {
-      $works[$key]['user'] = UserController::getBasicUserById($value['user_id']);
+      $works[$key]['user'] = UserController::getBasicUserById($value['user_id'], false, true);
       $works[$key]['translations'] = self::getWorkLangs($value['user_id'], $value['specialization_id']);
       unset($works[$key]['user_id']);
     }
@@ -66,7 +66,7 @@ class WorkController {
     $works = WorkDAO::getFilteredWorks($filter);
 
     foreach ($works as $key => $value) {
-      $works[$key]['user'] = UserController::getBasicUserById($value['user_id']);
+      $works[$key]['user'] = UserController::getBasicUserById($value['user_id'], false , true);
       $works[$key]['translations'] = self::getWorkLangs($value['user_id'], $value['specialization_id']);
       unset($works[$key]['user_id']);
     }

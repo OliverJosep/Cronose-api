@@ -116,14 +116,14 @@ INSERT INTO `Media`(extension,url) VALUES('.jpg','admmin_dni');
 
 INSERT INTO `DNI_Photo`(status,media_id) VALUES ('accepted',2);
 
-INSERT INTO `User`(dni, name, surname, surname_2, email, password, tag, initials, coins, registration_date, points, private, city_cp, province_id, avatar_id, dni_photo_id,validated)
-  VALUES ('12345678A','Admin','Cronose','Cronose','admin@cronose.dawman.info','202cb962ac59075b964b07152d234b70',1254,'ACC',0.00,date(now()),0,0,07500,1,1,1,1);
-INSERT INTO `User`(dni, name, surname, surname_2, email, password, tag, initials, coins, registration_date, points, private, city_cp, province_id, avatar_id, dni_photo_id,validated)
-  VALUES ('87654321Z','Anastasia','Guiterrez','Marcos','Anastasi@cgmail.com','202cb962ac59075b964b07152d234b70',9875, 'AGC' ,0.00,date(now()),0,0,07500,1,1,1,1);
-INSERT INTO `User`(dni, name, surname, surname_2, email, password, tag, initials, coins, registration_date, points, private, city_cp, province_id, avatar_id, dni_photo_id,validated)
-  VALUES ('45612387J','Josep','Oliver','Sanso','josep.oliverr@gmail.com','202cb962ac59075b964b07152d234b70',1313, 'JOS',3.00,date(now()),0,0,07500,1,1,1,1);
+-- INSERT INTO `User`(dni, name, surname, surname_2, email, password, tag, initials, coins, registration_date, points, private, city_cp, province_id, avatar_id, dni_photo_id,validated)
+--   VALUES ('12345678A','Admin','Cronose','Cronose','admin@cronose.dawman.info','202cb962ac59075b964b07152d234b70',1254,'ACC',0.00,date(now()),0,0,07500,1,1,1,1);
+-- INSERT INTO `User`(dni, name, surname, surname_2, email, password, tag, initials, coins, registration_date, points, private, city_cp, province_id, avatar_id, dni_photo_id,validated)
+--   VALUES ('87654321Z','Anastasia','Guiterrez','Marcos','Anastasi@cgmail.com','202cb962ac59075b964b07152d234b70',9875, 'AGC' ,0.00,date(now()),0,0,07500,1,1,1,1);
+-- INSERT INTO `User`(dni, name, surname, surname_2, email, password, tag, initials, coins, registration_date, points, private, city_cp, province_id, avatar_id, dni_photo_id,validated)
+--   VALUES ('45612387F','Bernardo','Oliver','Sanso','bernardo.oliverr@gmail.com','202cb962ac59075b964b07152d234b70',1353, 'BOS',3.00,date(now()),0,0,07500,1,1,1,1);
 
-INSERT INTO `User_Language` (`language_id`, `user_id`, `description`) VALUES ('ca', '1', 'Hola, soc l\'adminstrador de la pàgina');
+-- INSERT INTO `User_Language` (`language_id`, `user_id`, `description`) VALUES ('ca', '1', 'Hola, soc l\'adminstrador de la pàgina');
 
 INSERT INTO `Achievement` VALUES (),(),(),(),();
 
@@ -144,9 +144,9 @@ INSERT INTO `Achievement_Language`(`language_id`, `achievement_id`, `name`, `des
 ('es', 4, 'a4', 'Realiza tu primer trabajo'),
 ('es', 5, 'a5', 'Contrata a alguien');
 
-INSERT INTO `Obtain`(`achievement_id`, `user_id`, `obtained_at`) VALUES
-(1, '1', '2020-01-08'),
-(3, '1', '2020-01-02');
+-- INSERT INTO `Obtain`(`achievement_id`, `user_id`, `obtained_at`) VALUES
+-- (1, '1', '2020-01-08'),
+-- (3, '1', '2020-01-02');
 
 INSERT INTO `Category`(`id`, `coin_price`) VALUES
 (1, 1.2),
@@ -300,19 +300,19 @@ INSERT INTO `Specialization_Language`(`language_id`, `specialization_id`, `name`
 ('en', 27, 'Stylist'),
 ('es', 27, 'Estilista');
 
-INSERT INTO `Offer`(user_id, specialization_id, valoration_avg, personal_valoration, coin_price, offered_at, visibility) VALUES
-('1', '1', '90', '70', '1.2', '2019-12-21', '1'),
-('2', '2', '50', '50', '1', '2019-12-22', '1');
+-- INSERT INTO `Offer`(user_id, specialization_id, valoration_avg, personal_valoration, coin_price, offered_at, visibility) VALUES
+-- ('1', '1', '90', '70', '1.2', '2019-12-21', '1'),
+-- ('2', '2', '50', '50', '1', '2019-12-22', '1');
 
-INSERT INTO `Offer_Language`(language_id, user_id, specialization_id, title, description) VALUES
-('ca', '1', '1', 'Professor de programació', 'Programació básica de c++, Programació avançada de Java, ');
+-- INSERT INTO `Offer_Language`(language_id, user_id, specialization_id, title, description) VALUES
+-- ('ca', '1', '1', 'Professor de programació', 'Programació básica de c++, Programació avançada de Java, ');
 
-INSERT INTO `Offer_Language`(language_id, user_id, specialization_id, title, description) VALUES
-('es', '2', '2', 'Fontanero', 'No hay ni uno igual ');
+-- INSERT INTO `Offer_Language`(language_id, user_id, specialization_id, title, description) VALUES
+-- ('es', '2', '2', 'Fontanero', 'No hay ni uno igual ');
 
-INSERT INTO `Media`(extension, url) VALUES ('.jpg','profesor'),('.jpg','fontanero');
+-- INSERT INTO `Media`(extension, url) VALUES ('.jpg','profesor'),('.jpg','fontanero');
 
-INSERT INTO `Load_Media`(user_id, specialization_id, media_id) VALUES ('1', '1', '3'), ('1', '2', '4');
+-- INSERT INTO `Load_Media`(user_id, specialization_id, media_id) VALUES ('1', '1', '3'), ('1', '2', '4');
 
 INSERT INTO `Seniority` VALUES (1,100,0),(2,250,0),(3,450,0),(4,700,0),(5,1000,0);
 
@@ -320,25 +320,25 @@ INSERT INTO `Change_Seniority` VALUES (2,1,date(now())),(1,2,date(now()));
 
 INSERT INTO `Cancelation_Policy` () VALUES ();
 
-INSERT INTO `Demands` (`id`, `client_id`, `worker_id`, `specialization_id`, `demanded_at`) VALUES (NULL, '2', '1', '1', CURRENT_TIMESTAMP);
-INSERT INTO `Demands` (`id`, `client_id`, `worker_id`, `specialization_id`, `demanded_at`) VALUES (NULL, '3', '1', '1', '2020-02-18 00:15:15');
+-- INSERT INTO `Demands` (`id`, `client_id`, `worker_id`, `specialization_id`, `demanded_at`) VALUES (NULL, '2', '1', '1', CURRENT_TIMESTAMP);
+-- INSERT INTO `Demands` (`id`, `client_id`, `worker_id`, `specialization_id`, `demanded_at`) VALUES (NULL, '3', '1', '1', '2020-02-18 00:15:15');
 
-INSERT INTO `Card` (`id`, `status`, `work_date`, `qr_code_id`, `cancelation_policy_id`, `demand_id`) VALUES (NULL, 'accepted', '2020-01-19 00:00:00', NULL, '1', '1');
-INSERT INTO `Card` (`id`, `status`, `work_date`, `qr_code_id`, `cancelation_policy_id`, `demand_id`) VALUES (NULL, 'accepted', '2020-01-19 00:00:00', NULL, '1', '2');
+-- INSERT INTO `Card` (`id`, `status`, `work_date`, `qr_code_id`, `cancelation_policy_id`, `demand_id`) VALUES (NULL, 'accepted', '2020-01-19 00:00:00', NULL, '1', '1');
+-- INSERT INTO `Card` (`id`, `status`, `work_date`, `qr_code_id`, `cancelation_policy_id`, `demand_id`) VALUES (NULL, 'accepted', '2020-01-19 00:00:00', NULL, '1', '2');
 
 INSERT INTO `Comment`() VALUES (),();
 
-INSERT INTO `Comment_Language` (`language_id`, `comment_id`, `text`) VALUES ('ca', '1', 'Perfecte!');
-INSERT INTO `Comment_Language` (`language_id`, `comment_id`, `text`) VALUES ('es', '1', 'Perfecto!');
-INSERT INTO `Comment_Language` (`language_id`, `comment_id`, `text`) VALUES ('ca', '2', 'meeh');
+-- INSERT INTO `Comment_Language` (`language_id`, `comment_id`, `text`) VALUES ('ca', '1', 'Perfecte!');
+-- INSERT INTO `Comment_Language` (`language_id`, `comment_id`, `text`) VALUES ('es', '1', 'Perfecto!');
+-- INSERT INTO `Comment_Language` (`language_id`, `comment_id`, `text`) VALUES ('ca', '2', 'meeh');
 
-INSERT INTO `Valoration_Label` (`id`) VALUES (NULL);
+-- INSERT INTO `Valoration_Label` (`id`) VALUES (NULL);
 
-INSERT INTO `Valoration_Label_Language` (`language_id`, `valoration_label_id`, `aspect`) VALUES 
-('ca', '1', 'Puntualitat'),
-('en', '1', 'Puntualidad'), 
-('es', '1', 'Puntuality');
+-- INSERT INTO `Valoration_Label_Language` (`language_id`, `valoration_label_id`, `aspect`) VALUES 
+-- ('ca', '1', 'Puntualitat'),
+-- ('en', '1', 'Puntualidad'), 
+-- ('es', '1', 'Puntuality');
 
-INSERT INTO `Worker_Valoration` (`valoration_id`, `card_id`, `comment_id`, `puntuation`) VALUES ('1', '1', '1', '98');
-INSERT INTO `Worker_Valoration` (`valoration_id`, `card_id`, `comment_id`, `puntuation`) VALUES ('1', '2', '2', '75');
+-- INSERT INTO `Worker_Valoration` (`valoration_id`, `card_id`, `comment_id`, `puntuation`) VALUES ('1', '1', '1', '98');
+-- INSERT INTO `Worker_Valoration` (`valoration_id`, `card_id`, `comment_id`, `puntuation`) VALUES ('1', '2', '2', '75');
 

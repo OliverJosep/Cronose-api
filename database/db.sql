@@ -1,3 +1,4 @@
+drop database Cronose;
 create database if not exists `Cronose` character set UTF8 collate utf8_spanish_ci;
 use `Cronose`;
 set sql_mode = 'allow_invalid_dates';
@@ -167,6 +168,7 @@ create table if not exists `Message` (
     receiver_id int not null,
     sended_date timestamp not null unique,
     message varchar(400) not null,
+    satus ENUM('pending', 'seen') DEFAULT 'pending',
     foreign key (sender_id) references `User`(id),
     foreign key (receiver_id) references `User`(id),
     primary key(sender_id, receiver_id, sended_date)
