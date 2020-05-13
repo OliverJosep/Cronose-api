@@ -67,10 +67,9 @@ class WorkDAO extends DAO {
   }
 
   public static function getWorks($limit, $offset) {
-    $sql = "SELECT Offer.user_id, Offer.specialization_id, User.initials, User.tag, User.name, User.surname, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg 
-      FROM User,Offer 
-      WHERE User.id = Offer.user_id 
-      AND Offer.visibility = true 
+    $sql = "SELECT Offer.user_id, Offer.specialization_id, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg 
+      FROM Offer 
+      WHERE Offer.visibility = true 
       LIMIT :limit OFFSET :offset";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':limit', $limit, PDO::PARAM_INT);

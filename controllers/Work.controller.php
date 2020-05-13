@@ -22,21 +22,15 @@ class WorkController {
   public static function getAllWorksByUser($user_id, $lang) {
     $works = WorkDAO::getAllWorksByUser($user_id);
     foreach ($works as $key => $value) {
+      $works[$key]['user'] = UserController::getBasicUserById($value['user_id']);
       $works[$key]['translations'] = self::getWorkLangs($value['user_id'], $value['specialization_id']);
+      unset($works[$key]['user_id']);
     }
     foreach ($works as $key => $value) {
       $works[$key]['translations'] = Language::orderByLang($lang, $value['translations']);
     }
     return $works;
   }
-
-  // public static function getWorks($limit, $offset) {
-  //   $works = WorkDAO::getWorks($limit, $offset);
-  //   foreach ($works as $key => $value) {
-  //     $works[$key]['translations'] = self::getWorkLangs($value['user_id'], $value['specialization_id']);
-  //   }
-  //   return $works;
-  // }
 
   public static function getWorksByLang($limit, $offset, $lang) {
     $works = WorkDAO::getWorksByLang($limit, $offset, $lang);
@@ -56,7 +50,9 @@ class WorkController {
     $works = WorkDAO::getWorks($limit, $offset);
 
     foreach ($works as $key => $value) {
+      $works[$key]['user'] = UserController::getBasicUserById($value['user_id']);
       $works[$key]['translations'] = self::getWorkLangs($value['user_id'], $value['specialization_id']);
+      unset($works[$key]['user_id']);
     }
 
     foreach ($works as $key => $value) {
@@ -70,7 +66,9 @@ class WorkController {
     $works = WorkDAO::getFilteredWorks($filter);
 
     foreach ($works as $key => $value) {
+      $works[$key]['user'] = UserController::getBasicUserById($value['user_id']);
       $works[$key]['translations'] = self::getWorkLangs($value['user_id'], $value['specialization_id']);
+      unset($works[$key]['user_id']);
     }
 
     foreach ($works as $key => $value) {

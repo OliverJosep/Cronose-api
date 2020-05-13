@@ -42,14 +42,14 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
     $view::json(UserController::getUserByInitialsAndTag($initial, $tag, $lang)); // Get all user information with a default lang.
   });
 
-  // Work
-  $router->get('/work/{initials}/{tag}/{specialization}', function($initials, $tag, $specialization) use ($view, $lang) {
+  // Offer
+  $router->get('/offer/{initials}/{tag}/{specialization}', function($initials, $tag, $specialization) use ($view, $lang) {
     $view::json(WorkController::getWork($initials, $tag, $specialization, $lang));
   });
-  $router->post('/work', function() use ($view, $lang) {
+  $router->post('/offer', function() use ($view, $lang) {
     $view::json(WorkController::setNewWork($lang, $_REQUEST['data']));
   });
-  $router->mount('/works', function() use ($router, $view, $lang) {
+  $router->mount('/offers', function() use ($router, $view, $lang) {
     $router->get('/', function() use ($view, $lang) {
       $view::json(WorkController::getAllWorks($lang));
     });
@@ -147,9 +147,9 @@ $router->mount('/user', function() use ($router, $view) {
   $router->get('/{initials}/{tag}', function($initial, $tag) use ($view) {
     $view::json(UserController::getUserByInitialsAndTag($initial, $tag)); // Falta la descripció de l'usuari.
   });
-  $router->post('/update/description', function() {
-    // echo json_encode(UserController::updateData($_POST));
-  });
+  // $router->post('/update/description', function() {
+  //   // echo json_encode(UserController::updateData($_POST));
+  // });
   $router->post('/update', function() {
     echo json_encode(UserController::updateData($_POST));
   });
@@ -172,9 +172,8 @@ $router->post('/login', function()  use ($view){
   else $view::json(UserController::userLogin($_POST['email'], $_POST['password']));
 });
 
-// Works
-
-$router->mount('/work', function() use ($router, $view) {
+// Job Offers
+$router->mount('/offer', function() use ($router, $view) {
   $router->get('/translations', function() use ($view) {
     $view::json(WorkController::getTranslations($_GET));
   });
@@ -188,7 +187,7 @@ $router->mount('/work', function() use ($router, $view) {
     $view::json(WorkController::updateVisibility($_POST));
   });
 });
-$router->post('/works/filter', function() use ($view) {
+$router->post('/job-offers/filter', function() use ($view) {
   $view::json(WorkController::getFilteredWorks($_REQUEST['filter']));
 });
 
