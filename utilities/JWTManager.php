@@ -21,9 +21,9 @@ function createJWT($data = []) {
 function decodeJWT($jwt, $callback) {
   global $config;
   try {
-    $decoded = serialize(JWT::decode($jwt, $config['jwt_key'], array('HS256')));
-    $decoded = json_decode($decoded, true);
-    call_user_func($callback, $decoded['data']);
+    $decoded = JWT::decode($jwt, $config['jwt_key'], array('HS256'));
+    $decoded_array = (array) $decoded;
+    call_user_func($callback, $decoded_array);
   } catch(Exception $e) {
     http_response_code(401);
     return json_encode(array(

@@ -30,8 +30,6 @@ require_once '../utilities/Logger.php';
 /** JWT */
 require_once '../utilities/JWTManager.php';
 
-
-
 /* ROUTES */
 require_once '../utilities/routes.php';
 
