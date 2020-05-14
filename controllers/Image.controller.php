@@ -6,6 +6,11 @@ class ImageController {
 
   public static function saveImages($user_initials, $user_tag, $files){
     foreach ($files as $key => &$file) {
+      // return $file['tmp_name'];
+      if ($file['tmp_name'] === '') {
+        $files[$key] = null;
+        continue;
+      }
       $dir = "images/" . strval($key);
       $name = "${user_initials}_${user_tag}";
       $fullUrl = $key.'/'.$name;

@@ -153,38 +153,63 @@ class UserDAO extends DAO {
 
  
   public static function saveUser($user, $fiels) {
-    // return $user;
 
+    /* NAME */
+    $name = ucfirst($user['name']);
+    $surname = ucfirst($user['surname']);
+    $surname_2 = ucfirst($user['surname_2']) ?? null;
     /* DEFAULT VALUES */
-    $surname_2 = ucfirst($user['surname_2']) ?? "";
     $user['private'] = (isset($user['private'])) ? 1 : 0;
     $user['avatar'] = $user['avatar'] ?? 'null';
+    $date = date("Y-m-d H:i:s");
+    $coins = 0;
+    $points = 0;
+    $validated = 1;
     /* SAVE FILES */
 
     /* INITIALS ANS TAG GENERATE */
-    $words = preg_split("/\s+/", "${user['name']} ${user['surname']} ${user['surname_2']}");
+    $words = preg_split("/\s+/", "${name} ${surname} ${surname_2}");
     $initials = "";
     foreach ($words as $w) {
-      $initials .= $w[0];
+      if (isset($w[0])) $initials .= $w[0];
     };
     do{
     $tag = mt_rand(1000, 9999);
     } while(self::getUserByInitialsAndTag($initials, $tag));
 
     $img = ImageController::saveImages($initials, $tag, $fiels);
-    $name = ucfirst($user['name']);
-    $surname = ucfirst($user['surname']);
 
     /* SQL BEGIN CONSTRUCTION */
-    $fields = "dni, name, surname, surname_2, email, password, tag, initials, coins, registration_date, points, private, city_cp, province_id, avatar_id, dni_photo_id";
-    $values = "'${user['dni']}', '${name}', '${surname}', '${surname_2}', '${user['email']}', '${user['password']}', ";
-    
-    $date = date("Y-m-d H:i:s");
-    $values = $values."${tag}, '${initials}', 0, '${date}', 0, ${user['private']}, ${user['city_cp']}, ${user['province_id']}, ";
-    $values .= $img['avatar']['id'] . ', ' . $img['dni_img']['id'];
+    $fields =  "dni, name, surname, surname_2, email, password, 
+                tag, initials, coins, registration_date, points, private, validated,
+                city_cp, province_id, avatar_id, dni_photo_id";
+    $values =  ":dni, :name, :surname, :surname_2, :email, :password, 
+                :tag, :initials, :coins, :registration_date, :points, :private, :validated,
+                :city_cp, :province_id, :avatar_id, :dni_photo_id";
+
     $sql = "INSERT INTO User (${fields}) VALUES (${values})";
     /* SQL END CONSTRUCTION */
+
     $statement = self::$DB->prepare($sql);
+
+    $statement->bindParam(':dni', $user['dni'], PDO::PARAM_STR);
+    $statement->bindParam(':name', $name, PDO::PARAM_STR);
+    $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
+    $statement->bindParam(':surname_2', $surname_2, PDO::PARAM_STR);
+    $statement->bindParam(':email', $user['email'], PDO::PARAM_STR);
+    $statement->bindParam(':password', $user['password'], PDO::PARAM_STR);
+    $statement->bindParam(':tag', $tag, PDO::PARAM_INT);
+    $statement->bindParam(':initials', $initials, PDO::PARAM_STR);
+    $statement->bindParam(':coins', $coins, PDO::PARAM_INT);
+    $statement->bindParam(':registration_date', $date, PDO::PARAM_STR);
+    $statement->bindParam(':points', $points, PDO::PARAM_INT);
+    $statement->bindParam(':private', $user['private'], PDO::PARAM_INT);
+    $statement->bindParam(':validated', $validated, PDO::PARAM_INT);
+    $statement->bindParam(':city_cp', $user['city_cp'], PDO::PARAM_INT);
+    $statement->bindParam(':province_id', $user['province_id'], PDO::PARAM_INT);
+    $statement->bindParam(':avatar_id', $img['avatar']['id'], PDO::PARAM_INT);
+    $statement->bindParam(':dni_photo_id', $img['dni_img']['id'], PDO::PARAM_INT);
+
     try {
       $statement->execute();
       $errors = $statement->errorInfo();
