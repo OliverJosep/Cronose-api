@@ -4,4 +4,6 @@
 */*config*
 !*.example
 
+public/images/
+
 .idea/codeStyles/
