@@ -100,10 +100,10 @@ class UserController {
   public static function userLogin($email, $password) {
     $user = UserDAO::getPassword($email);
     if ($user['password'] != $password) {
-      http_response_code(400);
+      // http_response_code(400);
       return ["message" => "Invalid email or password"];
     } else if ($user['validated'] != '1') {
-      http_response_code(400);
+      // http_response_code(400);
       return ["message" => "You have to validate yout email!"];
     }
     return [
@@ -114,6 +114,16 @@ class UserController {
 
   public static function validateUser($token) {
     UserDAO::validateUser($token);
+  }
+
+  public static function existsDNI($dni) {
+    if (UserDAO::existsDNI($dni)) return true;
+    return false;
+  }
+
+  public static function existsEmail($email) {
+    if (UserDAO::existsEmail($email)) return true;
+    return false;
   }
 
   public static function resetPasswordToken($token, $password) {

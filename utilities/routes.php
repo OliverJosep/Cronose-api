@@ -169,6 +169,12 @@ $router->get('/validate/{token}', function($token) {
   UserController::validateUser($token);
   header('Location: https://www.cronose.dawman.info/userValidator');
 });
+$router->get('/dni', function() use ($view){
+  $view::json(UserController::existsDNI($_GET['dni']));
+});
+$router->get('/email', function() use ($view){
+  $view::json(UserController::existsEmail($_GET['email']));
+});
 
 // Login
 $router->post('/login', function()  use ($view){
