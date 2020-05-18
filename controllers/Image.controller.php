@@ -6,7 +6,6 @@ class ImageController {
 
   public static function saveImages($user_initials, $user_tag, $files){
     foreach ($files as $key => &$file) {
-      // return $file['tmp_name'];
       if ($file['tmp_name'] === '') {
         $files[$key] = null;
         continue;
@@ -20,6 +19,14 @@ class ImageController {
       if($key == 'dni_img') $file = ImageDAO::insertDNI($file['id']);
     }
     return $files;
+  }
+
+  public static function updateImages($user_initials, $user_tag, $img, $dir){
+    move_uploaded_file ($img['tmp_name'], "images/${dir}/${user_initials}_${user_tag}");
+  }
+
+  public static function active($media_id, $visible) {
+    ImageDAO::active($media_id, $visible);
   }
 
 }

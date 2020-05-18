@@ -19,8 +19,7 @@ class UserDAO extends DAO {
 
   public static function getUserCompleteData(&$user, $lang = null) {
     // Unset name in case of private user
-    $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
-    if ($user['private']) unset($user['name'], $user['surname'], $user['surname_2'], $user['full_name']);
+    self::getFullName($user);
 
     if (!$user['private']) $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
     $user['description'] = UserController::getUserDescription($user, $lang);
@@ -36,14 +35,19 @@ class UserDAO extends DAO {
 
   private static function getUserBasicData(&$user, $lang, $avatar) {
     // Unset name in case of private user
-    $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
-    if ($lang) $user['description'] = UserController::getUserDescription($user, $lang);
-    if ($user['private']) unset($user['name'], $user['surname'], $user['surname_2'], $user['full_name']);
+    self::getFullName($user);
 
     if ($avatar) $user['avatar'] = MediaController::getById($user['avatar_id']);
 
     // Unset not necessary information
     unset( $user['email'] ,$user['avatar_id'], $user['private']);
+  }
+
+  public static function getFullName(&$user) {
+    $user['full_name'] = ($user['private']) 
+      ? substr($user['name'], 0, 1) . ' ' . substr($user['surname'], 0, 1) . ' ' . substr($user['surname_2'], 0, 1)
+      : "${user['name']} ${user['surname']} ${user['surname_2']}";
+    if ($user['private']) unset($user['name'], $user['surname'], $user['surname_2']);
   }
 
   public static function getUserDescription($user_id) {
@@ -178,6 +182,7 @@ class UserDAO extends DAO {
     } while(self::getUserByInitialsAndTag($initials, $tag));
 
     $img = ImageController::saveImages($initials, $tag, $fiels);
+    if (!isset($img['dni_img'])) $img['dni_img']['id'] = 1;
 
     /* SQL BEGIN CONSTRUCTION */
     $fields =  "dni, name, surname, surname_2, email, password, 
@@ -318,7 +323,5 @@ class UserDAO extends DAO {
     $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
     return $statement->execute();
   }
-
-  
 
 }

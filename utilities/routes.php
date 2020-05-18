@@ -153,6 +153,12 @@ $router->mount('/user', function() use ($router, $view) {
   $router->post('/update', function() {
     echo json_encode(UserController::updateData($_POST));
   });
+  $router->post('/avatar/update', function() {
+    echo json_encode(ImageController::updateImages($_POST['user_initials'], $_POST['user_tag'], $_FILES['avatar'], 'avatar'));
+  });
+  $router->post('/avatar/visible', function() {
+    echo json_encode(ImageController::active($_POST['media_id'], $_POST['visible']));
+  });
 });
 
 // Register

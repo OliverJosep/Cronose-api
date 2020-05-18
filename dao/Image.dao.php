@@ -36,4 +36,13 @@ class ImageDAO extends DAO {
     return $id;
   }
 
+  public static function active($media_id, $visible) {
+    $sql = "UPDATE Media SET visible = :visible WHERE id = :media_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':media_id', $media_id, PDO::PARAM_INT);
+    $statement->bindParam(':visible', $visible, PDO::PARAM_INT);
+    return $statement->execute();
+  }
+
+
 }
