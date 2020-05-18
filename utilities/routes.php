@@ -205,8 +205,8 @@ $router->post('/job-offers/filter', function() use ($view) {
 
 // Cards
 $router->mount('/cards', function() use ($router, $view) {
-  $router->get('/{worker_id}/{client_id}/{specialization_id}', function($worker_id, $client_id, $specialization_id) use ($view) {
-    $view::json(WorkDemandController::getAllCards($worker_id, $client_id, $specialization_id));
+  $router->get('/{worker_id}/{client_id}', function($worker_id, $client_id) use ($view) {
+    $view::json(WorkDemandController::getAllCards($worker_id, $client_id));
   });
   $router->get('/{user_id}', function($user_id) use ($view) {
     $view::json(WorkDemandController::getAll($user_id));
@@ -222,7 +222,7 @@ $router->mount('/card', function() use ($router, $view) {
 });
 // Demands
 $router->post('/demand', function() use ($view) {
-  $view::json(WorkDemandController::createDemands($_POST['worker_id'], $_POST['client_id'], $_POST['specialization_id']));
+  $view::json(WorkDemandController::createCard($_POST['worker_id'], $_POST['client_id'], $_POST['specialization_id'], $_POST['work_date'], $_POST['cancelation_policy']));
 });
 
 // Chat

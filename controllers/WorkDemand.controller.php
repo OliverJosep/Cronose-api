@@ -8,8 +8,8 @@ class WorkDemandController {
     return WorkDemandDAO::getCard($card_id);
   }
 
-  public static function getAllCards($worker_id, $client_id, $specialization_id) {
-    return WorkDemandDAO::getCards($worker_id, $client_id, $specialization_id);
+  public static function getAllCards($worker_id, $client_id) {
+    return WorkDemandDAO::getAllCards($worker_id, $client_id);
   }
 
   public static function getAll($user_id) {
@@ -20,9 +20,13 @@ class WorkDemandController {
     return WorkDemandDAO::getAllByStatus($user_id, $status);
   }
 
-  // Demands
-  public static function createDemands($worker_id, $client_id, $specialization_id) {
-    return WorkDemandDAO::createDemands($worker_id, $client_id, $specialization_id);
+  // Demands ---- 
+  // 2020-05-19 15:00:00
+  public static function createCard($worker_id, $client_id, $specialization_id, $work_date, $cancelation_policy, $qr_code = null) {
+    if (!WorkDemandDAO::createDemands($worker_id, $client_id, $specialization_id)) return;
+    $demand_id = WorkDemandDAO::getDemandsId($worker_id, $client_id, $specialization_id)['id'];
+    WorkDemandDAO::createCard($work_date, $cancelation_policy, $demand_id, $qr_code);
+    return $demand_id;
   }
 
 }
