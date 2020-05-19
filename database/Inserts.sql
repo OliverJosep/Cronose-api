@@ -318,7 +318,12 @@ INSERT INTO `Specialization_Language`(`language_id`, `specialization_id`, `name`
 
 -- INSERT INTO `Change_Seniority` VALUES (2,1,date(now())),(1,2,date(now()));
 
-INSERT INTO `Cancelation_Policy` () VALUES ();
+INSERT INTO `Cancellation_Policy` () VALUES (),(),(),();
+INSERT INTO `Cancellation_Language` (`language_id`, `cancellation_policy_id`, `name`, `description`) 
+VALUES ('ca','1','Nul', 'nul'), ('en', '1', 'Null', 'null'), ('es', '1', 'Nulo', 'nulo'),
+('ca','2','Bàsica', 'bàsica'), ('en', '2', 'Basic', 'basic'), ('es', '2', 'Basica', 'basica'),
+('ca','3','Moderada', 'moderada'), ('en', '3', 'Moderate', 'moderate'), ('es', '3', 'Moderada', 'moderada'),
+('ca','4','Estricta', 'estricta'), ('en', '4', 'Strict', 'strict'), ('es', '4', 'Estricta', 'estricta');
 
 -- INSERT INTO `Demands` (`id`, `client_id`, `worker_id`, `specialization_id`, `demanded_at`) VALUES (NULL, '2', '1', '1', CURRENT_TIMESTAMP);
 -- INSERT INTO `Demands` (`id`, `client_id`, `worker_id`, `specialization_id`, `demanded_at`) VALUES (NULL, '3', '1', '1', '2020-02-18 00:15:15');

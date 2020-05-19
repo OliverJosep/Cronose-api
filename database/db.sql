@@ -71,32 +71,32 @@ create table if not exists `Specialization_Language` (
     primary key(language_id, specialization_id)
 )ENGINE = InnoDB;
 
-create table if not exists `Cancelation_Policy` (
+create table if not exists `Cancellation_Policy` (
     id int auto_increment primary key not null
 )ENGINE = InnoDB;
 
-create table if not exists `Cancelation_Language` (
+create table if not exists `Cancellation_Language` (
     language_id varchar(2) not null,
-    cancelation_policy_id int not null,
+    cancellation_policy_id int not null,
     name varchar(25) not null,
     description varchar(255) not null,
     foreign key (language_id) references `Language`(id),
-    foreign key (cancelation_policy_id) references `Cancelation_Policy`(id),
-    primary key(language_id, cancelation_policy_id)
+    foreign key (cancellation_policy_id) references `Cancellation_Policy`(id),
+    primary key(language_id, cancellation_policy_id)
 )ENGINE = InnoDB;
 
-create table if not exists `Cancelation_Section` (
+create table if not exists `Cancellation_Section` (
     id int auto_increment primary key not null,
-    cancelation_compensation double(2, 2) not null,
-    cancelation_zone double(2, 2) not null
+    cancellation_compensation double(2, 2) not null,
+    cancellation_zone double(2, 2) not null
 )ENGINE = InnoDB;
 
-create table if not exists `Cancelation_Integrates_Section` (
-    cancelation_policy_id int not null,
-    cancelation_section_id int not null,
-    foreign key (cancelation_policy_id) references `Cancelation_Policy`(id),
-    foreign key (cancelation_section_id) references `Cancelation_Section`(id),
-    primary key(cancelation_policy_id, cancelation_section_id)
+create table if not exists `Cancellation_Integrates_Section` (
+    cancellation_policy_id int not null,
+    cancellation_section_id int not null,
+    foreign key (cancellation_policy_id) references `Cancellation_Policy`(id),
+    foreign key (cancellation_section_id) references `Cancellation_Section`(id),
+    primary key(cancellation_policy_id, cancellation_section_id)
 )ENGINE = InnoDB;
 
 create table if not exists `Media` (
@@ -342,10 +342,10 @@ create table if not exists `Card` (
     status enum('pending','accepted','done','rejected') default 'pending' not null,
     work_date datetime not null,
     qr_code_id int,
-    cancelation_policy_id int not null,
+    cancellation_policy_id int not null,
     demand_id int not null,
     foreign key (qr_code_id) references `QR_Code`(id),
-    foreign key (cancelation_policy_id) references `Cancelation_Policy`(id),
+    foreign key (cancellation_policy_id) references `Cancellation_Policy`(id),
     foreign key (demand_id) references `Demands`(id)
 )ENGINE = InnoDB;
 
@@ -367,11 +367,11 @@ create table if not exists `Auction` (
     personal_valoration int default 0 not null,
     start_coin_price double(2,1) not null,
     work_date date not null,
-    cancelation_policy_id int not null,
+    Cancellation_policy_id int not null,
     card_id int not null,
     foreign key (user_id) references `User`(id),
     foreign key (specialization_id) references `Specialization`(id),
-    foreign key (cancelation_policy_id) references `Cancelation_Policy`(id),
+    foreign key (Cancellation_policy_id) references `Cancellation_Policy`(id),
     foreign key (card_id) references `Card`(id),
     primary key (user_id, specialization_id, auctioned_at)
 )ENGINE = InnoDB;

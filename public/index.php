@@ -20,6 +20,7 @@ require_once '../controllers/Coin.controller.php';
 require_once '../controllers/Image.controller.php';
 require_once '../controllers/Token.controller.php';
 require_once '../controllers/Image.controller.php';
+require_once '../controllers/Cancellation.controller.php';
 
 // DAO
 require_once '../dao/DAO.php';

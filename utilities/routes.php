@@ -73,6 +73,11 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
   $router->get('/cards/{worker_id}/{client_id}', function($worker_id, $client_id) use ($view, $lang) {
     $view::json(WorkDemandController::getAllCards($worker_id, $client_id, $lang));
   });
+
+  // Cancelation
+  $router->get('/cancellations', function() use ($view, $lang) {
+    $view::json(CancellationController::getAll($lang));
+  });
 };
 
 // All Categories
