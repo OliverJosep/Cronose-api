@@ -6,31 +6,30 @@ require_once '../controllers/User.controller.php';
 class WorkDemandDAO extends DAO {
 
   public static function getCard($card_id) {
-    $sql = "SELECT * From Card WHERE id = :card_id;";
+    $sql = "SELECT *
+            FROM Card, Demands 
+            WHERE Card.demand_id = Demands.id
+            AND Card.id = :card_id;";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':card_id', $card_id, PDO::PARAM_INT);
     $statement->execute();
-    $card['card'] = $statement->fetch(PDO::FETCH_ASSOC);
+    $card = $statement->fetch(PDO::FETCH_ASSOC);
     return $card;
   }
 
   public static function getAllCards($worker_id, $client_id) {
-    // $cards['worker'] = UserController::getBasicUserById($worker_id);
-    // $cards['client'] = UserController::getBasicUserById($client_id);
     $sql = "SELECT Card.id FROM Card,Demands 
             WHERE Demands.id = Card.demand_id
             AND Demands.client_id = :client_id
             AND Demands.worker_id = :worker_id
-            -- AND Demands.specialization_id = :specialization_id
             ORDER BY Demands.demanded_at DESC";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':client_id', $client_id, PDO::PARAM_INT);
     $statement->bindParam(':worker_id', $worker_id, PDO::PARAM_INT);
-    // $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
     $statement->execute();
     $cards = $statement->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($cards as &$card) {
-      $card = self::getCard($card['id']);
+    foreach ($cards as $value => $key) {
+      $cards[$value] = self::getCard($cards[$value]['id']);
     }
     return $cards;
   }

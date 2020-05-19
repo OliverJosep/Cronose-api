@@ -91,6 +91,15 @@ class WorkController {
     return $work;
   }
 
+  public static function getWorkById($userId,$workEsp,$lang, $user = true) {
+    $work = WorkDAO::getWorkById($userId,$workEsp);
+    if ($user) $work = array('user' => UserController::getBasicUserById($work['user_id'], $lang, true)) + $work;
+    $work['translations'] = self::getWorkLangs($work['user_id'], $work['specialization_id']);
+    $work['translations'] = Language::orderByLang($lang, $work['translations']);
+    unset($work['user_id']);
+    return $work;
+  }
+
   public static function setNewWork($lang, $data){
     WorkDAO::setNewWork($data);
     WorkDAO::setNewWorkLang($lang, $data);

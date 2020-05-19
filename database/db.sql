@@ -101,6 +101,7 @@ create table if not exists `Cancelation_Integrates_Section` (
 
 create table if not exists `Media` (
     id int auto_increment primary key not null,
+    visible boolean not null default true,
     extension varchar(8) not null,
     url varchar(255) not null
 )ENGINE = InnoDB;

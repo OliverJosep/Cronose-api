@@ -68,6 +68,11 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
   $router->get('/achievements', function() use ($view, $lang) {
     $view::json(AchievementController::getAllByLang($lang));
   });
+
+  // Cards
+  $router->get('/cards/{worker_id}/{client_id}', function($worker_id, $client_id) use ($view, $lang) {
+    $view::json(WorkDemandController::getAllCards($worker_id, $client_id, $lang));
+  });
 };
 
 // All Categories
@@ -205,9 +210,9 @@ $router->post('/job-offers/filter', function() use ($view) {
 
 // Cards
 $router->mount('/cards', function() use ($router, $view) {
-  $router->get('/{worker_id}/{client_id}', function($worker_id, $client_id) use ($view) {
-    $view::json(WorkDemandController::getAllCards($worker_id, $client_id));
-  });
+  // $router->get('/{worker_id}/{client_id}', function($worker_id, $client_id) use ($view) {
+  //   $view::json(WorkDemandController::getAllCards($worker_id, $client_id));
+  // });
   $router->get('/{user_id}', function($user_id) use ($view) {
     $view::json(WorkDemandController::getAll($user_id));
   });

@@ -111,10 +111,10 @@ INSERT INTO `Province`(name) VALUES ('Illes Balears');
 
 INSERT INTO `City` VALUES (07500,1,'Manacor',3.20142,39.57434),(07000,1,'Palma',2.6474500,39.5695100),(07300,1,'Inca', 2.90588378 ,39.7186751 );
 
-INSERT INTO `Media`(extension,url) VALUES('.jpg','admmin_avatar');
-INSERT INTO `Media`(extension,url) VALUES('.jpg','admmin_dni');
+-- INSERT INTO `Media`(extension,url) VALUES('.jpg','admmin_avatar');
+-- INSERT INTO `Media`(extension,url) VALUES('.jpg','admmin_dni');
 
-INSERT INTO `DNI_Photo`(status,media_id) VALUES ('accepted',2);
+-- INSERT INTO `DNI_Photo`(status,media_id) VALUES ('accepted',2);
 
 -- INSERT INTO `User`(dni, name, surname, surname_2, email, password, tag, initials, coins, registration_date, points, private, city_cp, province_id, avatar_id, dni_photo_id,validated)
 --   VALUES ('12345678A','Admin','Cronose','Cronose','admin@cronose.dawman.info','202cb962ac59075b964b07152d234b70',1254,'ACC',0.00,date(now()),0,0,07500,1,1,1,1);
@@ -314,9 +314,9 @@ INSERT INTO `Specialization_Language`(`language_id`, `specialization_id`, `name`
 
 -- INSERT INTO `Load_Media`(user_id, specialization_id, media_id) VALUES ('1', '1', '3'), ('1', '2', '4');
 
-INSERT INTO `Seniority` VALUES (1,100,0),(2,250,0),(3,450,0),(4,700,0),(5,1000,0);
+-- INSERT INTO `Seniority` VALUES (1,100,0),(2,250,0),(3,450,0),(4,700,0),(5,1000,0);
 
-INSERT INTO `Change_Seniority` VALUES (2,1,date(now())),(1,2,date(now()));
+-- INSERT INTO `Change_Seniority` VALUES (2,1,date(now())),(1,2,date(now()));
 
 INSERT INTO `Cancelation_Policy` () VALUES ();
 
@@ -326,7 +326,7 @@ INSERT INTO `Cancelation_Policy` () VALUES ();
 -- INSERT INTO `Card` (`id`, `status`, `work_date`, `qr_code_id`, `cancelation_policy_id`, `demand_id`) VALUES (NULL, 'accepted', '2020-01-19 00:00:00', NULL, '1', '1');
 -- INSERT INTO `Card` (`id`, `status`, `work_date`, `qr_code_id`, `cancelation_policy_id`, `demand_id`) VALUES (NULL, 'accepted', '2020-01-19 00:00:00', NULL, '1', '2');
 
-INSERT INTO `Comment`() VALUES (),();
+-- INSERT INTO `Comment`() VALUES (),();
 
 -- INSERT INTO `Comment_Language` (`language_id`, `comment_id`, `text`) VALUES ('ca', '1', 'Perfecte!');
 -- INSERT INTO `Comment_Language` (`language_id`, `comment_id`, `text`) VALUES ('es', '1', 'Perfecto!');
