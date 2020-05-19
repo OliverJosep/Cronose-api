@@ -2,9 +2,9 @@
 
 require_once 'DAO.php';
 
-class WorkDAO extends DAO {
+class OfferDAO extends DAO {
 
-  public static function getAllWorksByLang($lang) {
+  public static function getAllOffersByLang($lang) {
     $sql = "SELECT Offer.specialization_id,CONCAT(User.initials,User.tag)AS tag_user ,User.tag,User.initials,Offer.user_id,Offer_Language.language_id,User.name,Offer_Language.title,Offer_Language.description,Offer.personal_valoration,Offer.valoration_avg,Offer.coin_price
       FROM Offer,Offer_Language,User 
       WHERE Offer.user_id = Offer_Language.user_id
@@ -16,7 +16,7 @@ class WorkDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function getWorksByIdANDLang($id, $lang) {
+  public static function getOffersByIdANDLang($id, $lang) {
     $sql = "SELECT Offer.specialization_id,CONCAT(User.initials,User.tag)AS tag_user,User.tag,User.initials,Offer.user_id,Offer_Language.language_id,User.name,Offer_Language.title,Offer_Language.description,Offer.personal_valoration,Offer.valoration_avg,Offer.coin_price
       FROM Offer,Offer_Language,User 
       WHERE Offer.user_id = Offer_Language.user_id
@@ -29,30 +29,30 @@ class WorkDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function getWork($userInitials,$userTag,$workEsp) {
+    public static function getOffer($userInitials,$userTag,$offerEsp) {
     $sql = "SELECT Offer.user_id,Offer.specialization_id,Offer.personal_valoration,Offer.valoration_avg,Offer.coin_price
       FROM Offer,User
       WHERE User.id = Offer.user_id
       AND User.initials = :userInitials
       AND User.tag= :userTag
-      AND Offer.specialization_id = :workEsp";
+      AND Offer.specialization_id = :offerEsp";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':userInitials', $userInitials, PDO::PARAM_STR);
     $statement->bindParam(':userTag', $userTag, PDO::PARAM_INT);
-    $statement->bindParam(':workEsp', $workEsp, PDO::PARAM_INT);
+    $statement->bindParam(':offerEsp', $offerEsp, PDO::PARAM_INT);
     $statement->execute();
     return $statement->fetch(PDO::FETCH_ASSOC);
   }
 
-  public static function getWorkById($userId,$workEsp) {
+  public static function getOfferById($userId,$offerEsp) {
   $sql = "SELECT Offer.user_id,Offer.specialization_id,Offer.personal_valoration,Offer.valoration_avg,Offer.coin_price
     FROM Offer,User
     WHERE User.id = Offer.user_id
     AND User.id = :userId
-    AND Offer.specialization_id = :workEsp";
+    AND Offer.specialization_id = :offerEsp";
   $statement = self::$DB->prepare($sql);
   $statement->bindParam(':userId', $userId, PDO::PARAM_INT);
-  $statement->bindParam(':workEsp', $workEsp, PDO::PARAM_INT);
+  $statement->bindParam(':offerEsp', $offerEsp, PDO::PARAM_INT);
   $statement->execute();
   return $statement->fetch(PDO::FETCH_ASSOC);
 }
@@ -60,7 +60,7 @@ class WorkDAO extends DAO {
 
   // ---------------------------------
 
-  public static function getAllWorks() {
+  public static function getAllOffers() {
     $sql = "SELECT Offer.user_id, Offer.specialization_id, User.initials, User.tag, User.name, User.surname, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg, Offer.visibility 
       FROM User,Offer 
       WHERE User.id = Offer.user_id";
@@ -82,7 +82,7 @@ class WorkDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function getWorks($limit, $offset) {
+  public static function getOffers($limit, $offset) {
     $sql = "SELECT Offer.user_id, Offer.specialization_id, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg 
       FROM Offer 
       WHERE Offer.visibility = true 
@@ -94,7 +94,7 @@ class WorkDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function getWorksByLang($limit, $offset, $lang) {
+  public static function getOffersByLang($limit, $offset, $lang) {
     $sql = "SELECT Offer.user_id, Offer.specialization_id, User.initials, User.tag, User.name, User.surname, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg 
       FROM Offer,Offer_Language,User 
       WHERE Offer.visibility = true 
@@ -111,7 +111,7 @@ class WorkDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function getWorkLangs($user_id, $specialization_id) {
+  public static function getOfferLangs($user_id, $specialization_id) {
     $sql = "SELECT Offer_Language.language_id,Offer_Language.title,Offer_Language.description
       FROM Offer,Offer_Language 
       WHERE Offer.user_id = Offer_Language.user_id
@@ -125,7 +125,7 @@ class WorkDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function getFilteredWorks($filter) {
+  public static function getFilteredOffers($filter) {
     
     $sql = "SELECT Offer.user_id, Offer.specialization_id, User.initials, User.tag, User.name, User.surname, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg
     FROM Offer, Offer_Language, User, Specialization 
@@ -153,7 +153,7 @@ class WorkDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function setNewWork($data){
+  public static function setNewOffer($data){
     $coin = self::getCoinPrice($data['specialization_id']);
     $sql = "INSERT INTO `Offer` 
     VALUES (:user_id, :specialization_id, 90, 100, :coin_price, now(), 1) ";
@@ -164,15 +164,15 @@ class WorkDAO extends DAO {
     $statement->execute();
   }
 
-  public static function setNewWorkLang($lang, $data){
+  public static function setNewOfferLang($lang, $data){
     $sql = "INSERT INTO `Offer_Language` (`language_id`, `user_id`, `specialization_id`, `title`, `description`) VALUES 
-            (:lang, :user_id, :specialization_id, :workTitle, :workDescription)";
+            (:lang, :user_id, :specialization_id, :offerTitle, :offerDescription)";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
     $statement->bindParam(':user_id', $data['user_id'], PDO::PARAM_INT);
     $statement->bindParam(':specialization_id', $data['specialization_id'], PDO::PARAM_INT);
-    $statement->bindParam(':workTitle', $data['workTitle'], PDO::PARAM_STR);
-    $statement->bindParam(':workDescription', $data['workDescription'], PDO::PARAM_STR);
+    $statement->bindParam(':offerTitle', $data['offerTitle'], PDO::PARAM_STR);
+    $statement->bindParam(':offerDescription', $data['offerDescription'], PDO::PARAM_STR);
     $statement->execute();
   }
 

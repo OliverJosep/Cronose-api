@@ -44,26 +44,26 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
 
   // Offer
   $router->get('/offer/{initials}/{tag}/{specialization}', function($initials, $tag, $specialization) use ($view, $lang) {
-    $view::json(WorkController::getWork($initials, $tag, $specialization, $lang));
+    $view::json(OfferController::getOffer($initials, $tag, $specialization, $lang));
   });
   $router->post('/offer', function() use ($view, $lang) {
-    $view::json(WorkController::setNewWork($lang, $_REQUEST['data']));
+    $view::json(OfferController::setNewOffer($lang, $_REQUEST['data']));
   });
   $router->mount('/offers', function() use ($router, $view, $lang) {
     $router->get('/', function() use ($view, $lang) {
-      $view::json(WorkController::getAllWorks($lang));
+      $view::json(OfferController::getAllOffers($lang));
     });
     $router->get('/user/{user_id}/all', function($user_id) use ($view, $lang) {
-      $view::json(WorkController::getOffersByUser($user_id, $lang, false));
+      $view::json(OfferController::getOffersByUser($user_id, $lang, false));
     });  
     $router->get('/user/{user_id}', function($user_id) use ($view, $lang) {
-      $view::json(WorkController::getOffersByUser($user_id, $lang));
+      $view::json(OfferController::getOffersByUser($user_id, $lang));
     });  
     $router->get('/all/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
-      $view::json(WorkController::getWorksDefaultLang($limit, $offset, $lang));
+      $view::json(OfferController::getOffersDefaultLang($limit, $offset, $lang));
     });
     $router->get('/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
-      $view::json(WorkController::getWorksByLang($limit, $offset, $lang));
+      $view::json(OfferController::getOffersByLang($limit, $offset, $lang));
     });
   });
 
@@ -74,7 +74,7 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
 
   // Cards
   $router->get('/cards/{worker_id}/{client_id}', function($worker_id, $client_id) use ($view, $lang) {
-    $view::json(WorkDemandController::getAllCards($worker_id, $client_id, $lang));
+    $view::json(OfferDemandController::getAllCards($worker_id, $client_id, $lang));
   });
 
   // Cancelation
@@ -200,42 +200,42 @@ $router->post('/login', function()  use ($view){
 // Job Offers
 $router->mount('/offer', function() use ($router, $view) {
   $router->get('/translations', function() use ($view) {
-    $view::json(WorkController::getTranslations($_GET));
+    $view::json(OfferController::getTranslations($_GET));
   });
   $router->post('/translations', function() use ($view) {
-    $view::json(WorkController::updateTranslations($_POST));
+    $view::json(OfferController::updateTranslations($_POST));
   });
   $router->get('/visible', function() use ($view) {
-    $view::json(WorkController::getVisibility($_GET));
+    $view::json(OfferController::getVisibility($_GET));
   });
   $router->post('/switch', function() use ($view) {
-    $view::json(WorkController::updateVisibility($_POST));
+    $view::json(OfferController::updateVisibility($_POST));
   });
 });
 $router->post('/job-offers/filter', function() use ($view) {
-  $view::json(WorkController::getFilteredWorks($_REQUEST['filter']));
+  $view::json(OfferController::getFilteredOffers($_REQUEST['filter']));
 });
 
 // Cards
 $router->mount('/cards', function() use ($router, $view) {
   // $router->get('/{worker_id}/{client_id}', function($worker_id, $client_id) use ($view) {
-  //   $view::json(WorkDemandController::getAllCards($worker_id, $client_id));
+  //   $view::json(OfferDemandController::getAllCards($worker_id, $client_id));
   // });
   $router->get('/{user_id}', function($user_id) use ($view) {
-    $view::json(WorkDemandController::getAll($user_id));
+    $view::json(OfferDemandController::getAll($user_id));
   });
 });
 $router->mount('/card', function() use ($router, $view) {
   $router->get('/{card_id}', function($card_id) use ($view) {
-    $view::json(WorkDemandController::getCard($card_id));
+    $view::json(OfferDemandController::getCard($card_id));
   });
   $router->get('/{status}/{user_id}', function($status, $user_id) use ($view) {
-    $view::json(WorkDemandController::getAllByStatus($user_id, $status));
+    $view::json(OfferDemandController::getAllByStatus($user_id, $status));
   });
 });
 // Demands
 $router->post('/demand', function() use ($view) {
-  $view::json(WorkDemandController::createCard($_POST['worker_id'], $_POST['client_id'], $_POST['specialization_id'], $_POST['work_date'], $_POST['cancelation_policy']));
+  $view::json(OfferDemandController::createCard($_POST['worker_id'], $_POST['client_id'], $_POST['specialization_id'], $_POST['work_date'], $_POST['cancelation_policy']));
 });
 
 // Chat

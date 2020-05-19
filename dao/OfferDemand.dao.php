@@ -3,7 +3,7 @@
 require_once 'DAO.php';
 require_once '../controllers/User.controller.php';
 
-class WorkDemandDAO extends DAO {
+class OfferDemandDAO extends DAO {
 
   public static function getCard($card_id) {
     $sql = "SELECT *

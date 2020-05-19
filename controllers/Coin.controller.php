@@ -1,7 +1,7 @@
 <?php
 
 require_once '../controllers/User.controller.php';
-require_once '../controllers/WorkDemand.controller.php';
+require_once '../controllers/OfferDemand.controller.php';
 require_once '../controllers/Category.controller.php';
 require_once '../controllers/Specialization.controller.php';
 
@@ -10,7 +10,7 @@ class CoinController {
   public function getCoinHistory($user_id) {
     $actualCoin = UserController::getUserById($user_id);
     $actualCoin = $actualCoin['coins'];
-    $jobs = WorkDemandController::getAllByStatus($user_id, 'done');
+    $jobs = OfferDemandController::getAllByStatus($user_id, 'done');
     $history = [];
 
     foreach ($jobs as $job) {
