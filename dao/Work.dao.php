@@ -69,11 +69,13 @@ class WorkDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function getAllWorksByUser($user_id) {
-    $sql = "SELECT Offer.user_id, Offer.specialization_id, User.initials, User.tag, User.name, User.surname, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg, Offer.visibility 
-      FROM User,Offer 
-      WHERE User.id = Offer.user_id
-      AND User.id = :user_id";
+  public static function getOffersByUser($user_id, $visibility) {
+    // if ($visibility) return 'hol';
+    // return $visibility;
+    $sql = "SELECT Offer.user_id, Offer.specialization_id, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg, Offer.visibility 
+      FROM Offer 
+      WHERE Offer.user_id = :user_id";
+    if ($visibility) $sql .= " AND Offer.visibility = 1";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $statement->execute();

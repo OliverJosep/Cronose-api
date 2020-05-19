@@ -53,8 +53,11 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
     $router->get('/', function() use ($view, $lang) {
       $view::json(WorkController::getAllWorks($lang));
     });
+    $router->get('/user/{user_id}/all', function($user_id) use ($view, $lang) {
+      $view::json(WorkController::getOffersByUser($user_id, $lang, false));
+    });  
     $router->get('/user/{user_id}', function($user_id) use ($view, $lang) {
-      $view::json(WorkController::getAllWorksByUser($user_id, $lang));
+      $view::json(WorkController::getOffersByUser($user_id, $lang));
     });  
     $router->get('/all/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
       $view::json(WorkController::getWorksDefaultLang($limit, $offset, $lang));
