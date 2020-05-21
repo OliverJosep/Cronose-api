@@ -153,27 +153,27 @@ class OfferDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function setNewOffer($data){
-    $coin = self::getCoinPrice($data['specialization_id']);
+  public static function setNewOffer($user_id, $specialization_id){
+    $coin = self::getCoinPrice($specialization_id);
     $sql = "INSERT INTO `Offer` 
     VALUES (:user_id, :specialization_id, 90, 100, :coin_price, now(), 1) ";
     $statement = self::$DB->prepare($sql);
-    $statement->bindParam(':user_id', $data['user_id'], PDO::PARAM_INT);
-    $statement->bindParam(':specialization_id', $data['specialization_id'], PDO::PARAM_INT);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
     $statement->bindParam(':coin_price', $coin['coin_price'], PDO::PARAM_STR);
-    $statement->execute();
+    return $statement->execute();
   }
 
-  public static function setNewOfferLang($lang, $data){
+  public static function setNewOfferLang($lang, $user_id, $specialization_id, $offerTitle, $offerDescription){
     $sql = "INSERT INTO `Offer_Language` (`language_id`, `user_id`, `specialization_id`, `title`, `description`) VALUES 
             (:lang, :user_id, :specialization_id, :offerTitle, :offerDescription)";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
-    $statement->bindParam(':user_id', $data['user_id'], PDO::PARAM_INT);
-    $statement->bindParam(':specialization_id', $data['specialization_id'], PDO::PARAM_INT);
-    $statement->bindParam(':offerTitle', $data['offerTitle'], PDO::PARAM_STR);
-    $statement->bindParam(':offerDescription', $data['offerDescription'], PDO::PARAM_STR);
-    $statement->execute();
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
+    $statement->bindParam(':offerTitle', $offerTitle, PDO::PARAM_STR);
+    $statement->bindParam(':offerDescription', $offerDescription, PDO::PARAM_STR);
+    return $statement->execute();
   }
 
   public static function getCoinPrice($sp){

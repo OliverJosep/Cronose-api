@@ -33,6 +33,6 @@ require_once '../utilities/Logger.php';
 require_once '../utilities/JWTManager.php';
 
 /* ROUTES */
-require_once '../utilities/routes.php';
+require_once '../utilities/routes/routes.php';
 
 ?>

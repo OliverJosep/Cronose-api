@@ -110,6 +110,10 @@ class UserController {
     ];
   }
 
+  public static function getAuthData($email, $password) {
+    return UserDAO::getAuthData($email, $password);
+  }
+
   public static function validateUser($token) {
     UserDAO::validateUser($token);
   }

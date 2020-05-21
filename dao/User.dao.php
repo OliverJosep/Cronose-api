@@ -58,6 +58,15 @@ class UserDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);    
   }
 
+  public static function getAuthData($email, $password) {
+    $sql = "SELECT id, initials, tag, email FROM User WHERE email = :email AND password = :password";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->bindParam(':password', $password, PDO::PARAM_STR);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);    
+  }
+
   public static function getAll() {
     $fields = self::$returnFields;
     $sql = "SELECT ${fields} FROM User";
@@ -155,7 +164,6 @@ class UserDAO extends DAO {
     return $users;
   }
 
- 
   public static function saveUser($user, $fiels) {
 
     /* NAME */

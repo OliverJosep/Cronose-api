@@ -7,6 +7,10 @@ $router = new Router();
 require_once '../utilities/View.php';
 $view = new View();
 
+// TODO API authentication
+require_once 'authRoutes.php';
+$auth = (isset($_REQUEST['jwt'])) ? validateJWT($_REQUEST['jwt']) :  false;
+
 $avaliable_langs = ['ca','es','en'];
 $url = explode("/", trim($_SERVER['REQUEST_URI'], "/"));
 
@@ -15,6 +19,9 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
 
   unset($url[0]);
   $_SERVER['REQUEST_URI'] = '/'.implode('/', $url);
+
+  // Authenticated routes with lang
+  if (!isset($auth['error'])) echo AuthRoutes::AuthRoutesLang($router, $url, $lang, $view, $auth);
 
   // Categories 
   $router->get('/categories', function() use ($view, $lang) {
@@ -45,9 +52,6 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
   // Offer
   $router->get('/offer/{initials}/{tag}/{specialization}', function($initials, $tag, $specialization) use ($view, $lang) {
     $view::json(OfferController::getOffer($initials, $tag, $specialization, $lang));
-  });
-  $router->post('/offer', function() use ($view, $lang) {
-    $view::json(OfferController::setNewOffer($lang, $_REQUEST['data']));
   });
   $router->mount('/offers', function() use ($router, $view, $lang) {
     $router->get('/', function() use ($view, $lang) {

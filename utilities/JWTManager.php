@@ -4,6 +4,7 @@ require_once '../libs/JWT/BeforeValidException.php';
 require_once '../libs/JWT/ExpiredException.php';
 require_once '../libs/JWT/SignatureInvalidException.php';
 require_once '../libs/JWT/JWT.php';
+require_once '../controllers/User.controller.php';
 
 function createJWT($data = []) {
   global $config;
@@ -30,12 +31,12 @@ function validateJWT($jwt) {
   try {
     $decoded = JWT::decode($jwt, $config['jwt_key'], array('HS256'));
     $decoded_array = (array) $decoded;
-    if ($decoded) return true;
+    if ($decoded) return UserController::getAuthData($decoded_array['email'], $decoded_array['password']);
   } catch(Exception $e) {
-    return json_encode(array(
+    return array(
         "message" => "Access denied.",
         "error" => $e->getMessage()
-    ));
+    );
   }
 
 }
