@@ -21,12 +21,14 @@ class ImageController {
     return $files;
   }
 
+  // TODO Arreglar imatges
   public static function updateImages($user_initials, $user_tag, $img, $dir){
+    // if (!isset($media_id)) saveImages($user_initials, $user_tag, $img);
     move_uploaded_file ($img['tmp_name'], "images/${dir}/${user_initials}_${user_tag}");
   }
 
   public static function active($media_id, $visible) {
-    ImageDAO::active($media_id, $visible);
+    return ImageDAO::active($media_id, $visible);
   }
 
 }

@@ -4,10 +4,32 @@ class AuthorizedRoutes {
 
   public static function AuthRoutes($router, $url, $view, $auth) {
 
+    // User
+  $router->mount('/user', function() use ($router, $view, $auth) {
+    $router->post('/description', function() use ($view, $auth) {
+      if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
+      $view::json(UserController::updateDescription($_POST));
+    });
+    $router->post('/update', function() use ($view, $auth) {
+      if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
+      $view::json(UserController::updateData($_POST));
+    });
+
+    // ! Change the extension of image files 
+    $router->post('/avatar/update', function() use ($view, $auth)  {
+      if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
+      $view::json(ImageController::updateImages($_POST['user_initials'], $_POST['user_tag'], $_FILES['avatar'], 'avatar'));
+    });
+    $router->post('/avatar/visible', function() use ($view, $auth)  {
+      if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
+      $view::json(ImageController::active($_POST['media_id'], $_POST['visible']));
+    });
+  });
+
     // Password
     $router->post('/reset_password', function() use ($view, $auth) {
       if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
-      return $view::json(UserController::updatePassword($_POST['password'], $_POST['user_id']));
+      $view::json(UserController::updatePassword($_POST['password'], $_POST['user_id']));
     });
 
     // Offers

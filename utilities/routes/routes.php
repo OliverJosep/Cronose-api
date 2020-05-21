@@ -156,25 +156,11 @@ $router->mount('/user', function() use ($router, $view) {
   $router->get('/description/{id}', function($user_id) use ($view) {
     $view::json(UserController::getUserDescription($user_id));
   });
-  $router->post('/description', function() use ($view) {
-    echo json_encode(UserController::updateDescription($_POST));
-  });
   $router->get('/{initials}/{tag}/id', function($initial, $tag) use ($view) {
     $view::json(UserController::getId($initial, $tag));
   });
   $router->get('/{initials}/{tag}', function($initial, $tag) use ($view) {
     $view::json(UserController::getUserByInitialsAndTag($initial, $tag)); 
-  });
-  $router->post('/update', function() {
-    echo json_encode(UserController::updateData($_POST));
-  });
-
-  // ! Change the extension of image files
-  $router->post('/avatar/update', function() {
-    echo json_encode(ImageController::updateImages($_POST['user_initials'], $_POST['user_tag'], $_FILES['avatar'], 'avatar'));
-  });
-  $router->post('/avatar/visible', function() {
-    echo json_encode(ImageController::active($_POST['media_id'], $_POST['visible']));
   });
 });
 
