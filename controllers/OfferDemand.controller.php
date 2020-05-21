@@ -26,11 +26,10 @@ class OfferDemandController {
   }
 
   // Demands 
-  public static function createCard($worker_id, $client_id, $specialization_id, $work_date, $cancelation_policy, $qr_code = null) {
+  public static function createCard($worker_id, $client_id, $specialization_id, $work_date, $cancellation_policy, $qr_code = null) {
     if (!OfferDemandDAO::createDemands($worker_id, $client_id, $specialization_id)) return;
     $demand_id = OfferDemandDAO::getDemandsId($worker_id, $client_id, $specialization_id)['id'];
-    OfferDemandDAO::createCard($work_date, $cancelation_policy, $demand_id, $qr_code);
-    return $demand_id;
+    return OfferDemandDAO::createCard($work_date, $cancellation_policy, $demand_id, $qr_code);
   }
 
 }

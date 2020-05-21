@@ -7,7 +7,7 @@ $router = new Router();
 require_once '../utilities/View.php';
 $view = new View();
 
-$avaliable_langs = ['ca','es','en','it'];
+$avaliable_langs = ['ca','es','en'];
 $url = explode("/", trim($_SERVER['REQUEST_URI'], "/"));
 
 # Url with a language
@@ -16,7 +16,7 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
   unset($url[0]);
   $_SERVER['REQUEST_URI'] = '/'.implode('/', $url);
 
-  // Categories
+  // Categories 
   $router->get('/categories', function() use ($view, $lang) {
     $view::json(CategoryController::getAllByLang($lang));
   });
@@ -141,7 +141,7 @@ $router->mount('/users', function() use ($router, $view) {
     $view::json(UserController::getAll());
   });
   $router->get('/{search}', function($search) use ($view) {
-    $view::json(UserController::getUsersBySearch($search));/***REVISAR***/
+    $view::json(UserController::getUsersBySearch($search));
   });
 });
 $router->mount('/user', function() use ($router, $view) {
@@ -158,20 +158,24 @@ $router->mount('/user', function() use ($router, $view) {
     $view::json(UserController::getId($initial, $tag));
   });
   $router->get('/{initials}/{tag}', function($initial, $tag) use ($view) {
-    $view::json(UserController::getUserByInitialsAndTag($initial, $tag)); // Falta la descripció de l'usuari.
+    $view::json(UserController::getUserByInitialsAndTag($initial, $tag)); 
   });
-  // $router->post('/update/description', function() {
-  //   // echo json_encode(UserController::updateData($_POST));
-  // });
   $router->post('/update', function() {
     echo json_encode(UserController::updateData($_POST));
   });
+
+  // ! Change the extension of image files
   $router->post('/avatar/update', function() {
     echo json_encode(ImageController::updateImages($_POST['user_initials'], $_POST['user_tag'], $_FILES['avatar'], 'avatar'));
   });
   $router->post('/avatar/visible', function() {
     echo json_encode(ImageController::active($_POST['media_id'], $_POST['visible']));
   });
+});
+
+// ValidateJWT
+$router->post('/validateJWT', function() use ($view) {
+  echo validateJWT($_POST['jwt']);
 });
 
 // Register
@@ -192,7 +196,7 @@ $router->get('/email', function() use ($view){
 // Login
 $router->post('/login', function()  use ($view){
   if (isset($_POST['jwt'])) echo decodeJWT($_POST['jwt'], function($data) use ($view) {
-    $view::json(UserController::userLogin($data['data']->email, $data['data']->password));
+    $view::json(UserController::userLogin($data['email'], $data['password']));
   });
   else $view::json(UserController::userLogin($_POST['email'], $_POST['password']));
 });
@@ -235,7 +239,7 @@ $router->mount('/card', function() use ($router, $view) {
 });
 // Demands
 $router->post('/demand', function() use ($view) {
-  $view::json(OfferDemandController::createCard($_POST['worker_id'], $_POST['client_id'], $_POST['specialization_id'], $_POST['work_date'], $_POST['cancelation_policy']));
+  $view::json(OfferDemandController::createCard($_POST['worker_id'], $_POST['client_id'], $_POST['specialization_id'], $_POST['work_date'], $_POST['cancellation_policy']));
 });
 
 // Chat

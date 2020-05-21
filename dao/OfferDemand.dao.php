@@ -20,8 +20,8 @@ class OfferDemandDAO extends DAO {
   public static function getAllCards($worker_id, $client_id) {
     $sql = "SELECT Card.id FROM Card,Demands 
             WHERE Demands.id = Card.demand_id
-            AND Demands.client_id = :client_id
-            AND Demands.worker_id = :worker_id
+            AND ((Demands.client_id = :client_id AND Demands.worker_id = :worker_id) 
+            OR (Demands.client_id = :worker_id AND Demands.worker_id = :client_id))
             ORDER BY Demands.demanded_at DESC";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':client_id', $client_id, PDO::PARAM_INT);
@@ -35,8 +35,9 @@ class OfferDemandDAO extends DAO {
   }
 
   public static function getAll($user_id) {
-
-    $sql = "SELECT * From Card WHERE (client_id = :user_id) OR (worker_id = :user_id);";
+    $sql = "SELECT Card.id From Demands,Card 
+            WHERE Card.demand_id = Demands.id 
+            AND (client_id = :user_id) OR (worker_id = :user_id)";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $statement->execute();
@@ -53,13 +54,14 @@ class OfferDemandDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function createCard($work_date, $cancelation_policy, $demand_id, $qr_code) {
-    $sql = "INSERT INTO `Card` (`id`, `status`, `work_date`, `qr_code_id`, `cancelation_policy_id`, `demand_id`) 
-            VALUES (NULL, 'pending', :work_date, :qr_code, :cancelation_policy, :demand_id)";
+  public static function createCard($work_date, $cancellation_policy, $demand_id, $qr_code) {
+    $sql = "INSERT INTO `Card` (`id`, `status`, `work_date`, `qr_code_id`, `cancellation_policy_id`, `demand_id`) 
+            VALUES (NULL, 'pending', :work_date, :qr_code, :cancellation_policy, :demand_id)";
+        // return $sql;
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':work_date', $work_date, PDO::PARAM_STR);
     $statement->bindParam(':qr_code', $qr_code, PDO::PARAM_INT);
-    $statement->bindParam(':cancelation_policy', $cancelation_policy, PDO::PARAM_INT);
+    $statement->bindParam(':cancellation_policy', $cancellation_policy, PDO::PARAM_INT);
     $statement->bindParam(':demand_id', $demand_id, PDO::PARAM_INT);
     return $statement->execute();
   }

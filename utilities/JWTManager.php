@@ -7,15 +7,7 @@ require_once '../libs/JWT/JWT.php';
 
 function createJWT($data = []) {
   global $config;
-  $payload = [
-    "iss" => $config['jwt_iss'],
-    "aud" => $config['jwt_aud'],
-    "iat" => $config['jwt_iat'],
-    "nbf" => $config['jwt_nbf'],
-    "data" => $data
-  ];
-
-  return JWT::encode($payload, $config['jwt_key']);
+  return JWT::encode($data, $config['jwt_key']);
 }
 
 function decodeJWT($jwt, $callback) {
@@ -31,6 +23,21 @@ function decodeJWT($jwt, $callback) {
         "error" => $e->getMessage()
     ));
   }
+}
+
+function validateJWT($jwt) {
+  global $config;
+  try {
+    $decoded = JWT::decode($jwt, $config['jwt_key'], array('HS256'));
+    $decoded_array = (array) $decoded;
+    if ($decoded) return true;
+  } catch(Exception $e) {
+    return json_encode(array(
+        "message" => "Access denied.",
+        "error" => $e->getMessage()
+    ));
+  }
+
 }
 
 ?>
