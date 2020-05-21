@@ -11,6 +11,7 @@ $view = new View();
 require_once 'authRoutes.php';
 $auth = (isset($_REQUEST['jwt'])) ? validateJWT($_REQUEST['jwt']) :  false;
 
+
 $avaliable_langs = ['ca','es','en'];
 $url = explode("/", trim($_SERVER['REQUEST_URI'], "/"));
 
@@ -21,7 +22,7 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
   $_SERVER['REQUEST_URI'] = '/'.implode('/', $url);
 
   // Authenticated routes with lang
-  if (!isset($auth['error'])) echo AuthRoutes::AuthRoutesLang($router, $url, $lang, $view, $auth);
+  if (!isset($auth['error'])) echo AuthorizedRoutes::AuthRoutesLang($router, $url, $lang, $view, $auth);
 
   // Categories 
   $router->get('/categories', function() use ($view, $lang) {
@@ -87,6 +88,9 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
   });
 };
 
+  // Authenticated routes
+  if (!isset($auth['error'])) echo AuthorizedRoutes::AuthRoutes($router, $url, $view, $auth);
+
 // All Categories
 $router->get('/categories', function() use ($view) {
   $view::json(CategoryController::getAll());
@@ -127,9 +131,6 @@ $router->get('/city/{cp}', function($cp) use ($view) {
 $router->mount('/reset_password', function() use ($router, $view) {
   $router->get('/{email}', function($email) {
     TokenController::generateResetPassword($email);
-  });
-  $router->post('/', function() use ($view) {
-    $view::json(UserController::updatePassword($_POST));
   });
   $router->post('/token', function() use ($view) {
     $view::json(TokenController::resetPassword($_POST['password'], $_POST['token']));
@@ -210,14 +211,8 @@ $router->mount('/offer', function() use ($router, $view) {
   $router->get('/translations', function() use ($view) {
     $view::json(OfferController::getTranslations($_GET));
   });
-  $router->post('/translations', function() use ($view) {
-    $view::json(OfferController::updateTranslations($_POST));
-  });
   $router->get('/visible', function() use ($view) {
     $view::json(OfferController::getVisibility($_GET));
-  });
-  $router->post('/switch', function() use ($view) {
-    $view::json(OfferController::updateVisibility($_POST));
   });
 });
 $router->post('/job-offers/filter', function() use ($view) {
@@ -239,28 +234,6 @@ $router->mount('/card', function() use ($router, $view) {
   });
   $router->get('/{status}/{user_id}', function($status, $user_id) use ($view) {
     $view::json(OfferDemandController::getAllByStatus($user_id, $status));
-  });
-});
-// Demands
-$router->post('/demand', function() use ($view) {
-  $view::json(OfferDemandController::createCard($_POST['worker_id'], $_POST['client_id'], $_POST['specialization_id'], $_POST['work_date'], $_POST['cancellation_policy']));
-});
-
-// Chat
-$router->get('/chats/{user_id}', function($user_id) use ($view) {
-  $view::json(ChatController::showChats($user_id));
-  // ChatControkller::showChats($user_id);
-});
-$router->mount('/chat', function() use ($router, $view) {
-  $router->get('/last/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
-    $view::json(ChatController::showChat($sender_id, $receiver_id, 0, 2, false));
-  });
-  $router->get('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
-    $view::json(ChatController::showChat($sender_id, $receiver_id));
-  });
-  $router->post('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
-    ChatController::sendMSG($sender_id, $receiver_id, $_POST['message'], $_POST['sended_date']);
-    // var_dump($_POST);
   });
 });
 

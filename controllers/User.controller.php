@@ -138,8 +138,8 @@ class UserController {
     return $data;
   }
 
-  public static function updatePassword($data) {
-    return UserDAO::updatePassword($data['password'], $data['user_id']);
+  public static function updatePassword($password, $user_id) {
+    return UserDAO::updatePassword($password, $user_id);
   }
 
   public static function getPassword($user_id) {
