@@ -20,15 +20,16 @@ class OfferController {
   }
   
   public static function getOffersByUser($user_id, $lang, $visibility = true) {
-    $offers['offers'] = OfferDAO::getOffersByUser($user_id, $visibility);
-    foreach ($offers['offers'] as $key => $value) {
-      $offers['offers'][$key]['translations'] = self::getOfferLangs($user_id, $value['specialization_id']);
+    $offers = OfferDAO::getOffersByUser($user_id, $visibility);
+    foreach ($offers as $key => $value) {
+      $offers[$key]['user'] = UserController::getBasicUserById($value['user_id'], false, true);
+      $offers[$key]['translations'] = self::getOfferLangs($user_id, $value['specialization_id']);
       unset($offers[$key]['user_id']);
     }
-    foreach ($offers['offers'] as $key => $value) {
-      $offers['offers'][$key]['translations'] = Language::orderByLang($lang, $value['translations']);
+    foreach ($offers as $key => $value) {
+      $offers[$key]['translations'] = Language::orderByLang($lang, $value['translations']);
     }
-    $offers['user'] = UserController::getBasicUserById($user_id, false, true);
+    // $offers['user'] = UserController::getBasicUserById($user_id, false, true);
     return $offers;
   }
 
@@ -62,8 +63,13 @@ class OfferController {
     return $offers;
   }
 
-  public static function getFilteredOffers($filter) {
-    $offers = OfferDAO::getFilteredOffers($filter);
+  public static function getFilteredOffers() {
+    // $_GET['category'], $_GET['specialization'], $_GET['text'], $_GET['lang']
+    $category = (isset($_GET['category'])) ? $_GET['category'] : null;
+    $specialization = (isset($_GET['specialization'])) ? $_GET['specialization'] : null;
+    $text = (isset($_GET['text'])) ? $_GET['text'] : null;
+    $lang = (isset($_GET['lang'])) ? $_GET['lang'] : null;
+    $offers = OfferDAO::getFilteredOffers($category, $specialization, $text, $lang);
 
     foreach ($offers as $key => $value) {
       $offers[$key]['user'] = UserController::getBasicUserById($value['user_id'], false , true);
@@ -72,7 +78,7 @@ class OfferController {
     }
 
     foreach ($offers as $key => $value) {
-      $offers[$key]['translations'] = Language::orderByLang($filter['defaultLang'], $value['translations']);
+      $offers[$key]['translations'] = Language::orderByLang($_GET['defaultLang'], $value['translations']);
     }
 
     return $offers;

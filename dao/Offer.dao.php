@@ -125,7 +125,7 @@ class OfferDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function getFilteredOffers($filter) {
+  public static function getFilteredOffers($category, $specialization, $text, $lang) {
     
     $sql = "SELECT Offer.user_id, Offer.specialization_id, User.initials, User.tag, User.name, User.surname, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg
     FROM Offer, Offer_Language, User, Specialization 
@@ -135,17 +135,17 @@ class OfferDAO extends DAO {
     AND Offer.specialization_id = Offer_Language.specialization_id 
     AND Offer.specialization_id = Specialization.id  ";
 
-    if (isset($filter['langs'])) {
+    if (isset($lang)) {
       $langs = "AND (";
-      foreach ($filter['langs'] as $key => $value) {
+      foreach ($lang as $key => $value) {
         if ($key != 0) $langs .= "OR ";
-        $langs .= "Offer_Language.language_id = '${value}' ";
+        $lang .= "Offer_Language.language_id = '${value}' ";
       }
       $sql .= $langs . ") ";
     }
-    if ($filter['category']) $sql .=  "AND Specialization.category_id = ${filter['category']} ";
-    if ($filter['specialization']) $sql .=  "AND Specialization.id = ${filter['specialization']} ";
-    if ($filter['string']) $sql .=  "AND Offer_Language.title LIKE '%${filter['string']}%' ";
+    if ($category) $sql .=  "AND Specialization.category_id = ${category} ";
+    if ($specialization) $sql .=  "AND Specialization.id = ${specialization} ";
+    if ($text) $sql .=  "AND Offer_Language.title LIKE '%${text}%' ";
     $sql .= "GROUP BY Offer.user_id,Offer.specialization_id
       LIMIT 10 OFFSET 0 ";
     $statement = self::$DB->prepare($sql);

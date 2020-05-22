@@ -36,12 +36,12 @@ class ChatController {
     $chats = array_values($chats);
     
     foreach ($chats as &$user) {
-      $user['reciver'] = ($sender === $user["sender_id"]) ? ChatDAO::getUserData($user["receiver_id"]) : ChatDAO::getUserData($user["sender_id"]) ;
-      $user['last'] = ChatDAO::getLastMessage($sender,$user["reciver"]['id']);
+      $user['receiver'] = ($sender === $user["sender_id"]) ? ChatDAO::getUserData($user["receiver_id"]) : ChatDAO::getUserData($user["sender_id"]) ;
+      $user['last'] = ChatDAO::getLastMessage($sender,$user["receiver"]['id']);
       unset($user["sender_id"], $user["receiver_id"]);
     }
     $chats = self::sortLastMessage($chats);
-    $chats = array('user' => UserController::getBasicUserById($sender, false, true)) + array('chats' => $chats);
+    // $chats = array('user' => UserController::getBasicUserById($sender, false, true)) + array('chats' => $chats);
     return $chats;
   }
 

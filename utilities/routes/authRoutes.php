@@ -56,7 +56,7 @@ class AuthorizedRoutes {
       $view::json(ChatController::showChats($user_id));
     });
     $router->mount('/chat', function() use ($router, $view, $auth) {
-      $router->get('/last/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
+      $router->get('/last/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view, $auth) {
         if ($sender_id !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
         $view::json(ChatController::showChat($sender_id, $receiver_id, 0, 2, false));
       });

@@ -201,8 +201,8 @@ $router->mount('/offer', function() use ($router, $view) {
     $view::json(OfferController::getVisibility($_GET));
   });
 });
-$router->post('/job-offers/filter', function() use ($view) {
-  $view::json(OfferController::getFilteredOffers($_REQUEST['filter']));
+$router->get('/offers/filter', function() use ($view) {
+  $view::json(OfferController::getFilteredOffers());
 });
 
 // Cards
