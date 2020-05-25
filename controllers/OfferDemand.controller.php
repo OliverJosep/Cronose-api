@@ -7,7 +7,11 @@ require_once 'Cancellation.controller.php';
 class OfferDemandController {
 
   public static function getCard($card_id) {
-    return OfferDemandDAO::getCard($card_id);
+    $card = OfferDemandDAO::getCard($card_id);
+    $card['worker'] = UserController::getBasicUserById($card['worker_id']);
+    $card['client'] = UserController::getBasicUserById($card['client_id']);
+    unset($card["worker_id"], $card["client_id"]);
+    return $card;
   }
 
   public static function getAllCards($worker_id, $client_id, $lang) {
@@ -41,4 +45,17 @@ class OfferDemandController {
     return OfferDemandDAO::updateCard($card_id, $status);
   }
 
+  public static function checkCards($user_id) {
+    $cards = OfferDemandDAO::checkCards($user_id);
+    foreach ($cards as $value => $key) {
+      if ($key['status'] === "accepted") {
+        $cards[$value] = self::getCard($key['id']);
+      } else {
+        OfferDemandDAO::updateCard($key['id'], "rejected");
+        unset($cards[$value]);
+      }
+    }
+    return $cards;
+  }
+  
 }

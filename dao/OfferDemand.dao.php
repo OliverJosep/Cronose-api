@@ -98,4 +98,17 @@ class OfferDemandDAO extends DAO {
     $statement->execute();
   }
 
+  public static function checkCards($user_id) {
+    $sql = "SELECT Card.id, status FROM Card,Demands 
+            WHERE Card.demand_id = Demands.id
+            AND (Demands.client_id = :user_id OR Demands.worker_id = :user_id)
+            AND status != 'rejected'
+            AND status != 'done'
+            AND work_date < date(now())";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetchAll(PDO::FETCH_ASSOC);
+  }
+
 }

@@ -44,7 +44,7 @@ class AuthorizedRoutes {
       });
     });
 
-    // Demand card
+    // Cards
     $router->post('/demand', function() use ($view, $auth) {
       if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
       $view::json(OfferDemandController::createCard($_POST['worker_id'], $_POST['user_id'], $_POST['specialization_id'], $_POST['work_date'], $_POST['cancellation_policy']));
@@ -52,6 +52,10 @@ class AuthorizedRoutes {
     $router->post('/card', function() use ($auth) {
       if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
       OfferDemandController::updateCard($_POST['card_id'], $_POST['status']);
+    });
+    $router->get('/cards/done', function() use ($view, $auth) {
+      if ($_GET['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
+      $view::json(OfferDemandController::checkCards($_GET['user_id']));
     });
 
     // Chat
