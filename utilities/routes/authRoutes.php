@@ -49,6 +49,10 @@ class AuthorizedRoutes {
       if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
       $view::json(OfferDemandController::createCard($_POST['worker_id'], $_POST['user_id'], $_POST['specialization_id'], $_POST['work_date'], $_POST['cancellation_policy']));
     });
+    $router->post('/card', function() use ($auth) {
+      if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
+      OfferDemandController::updateCard($_POST['card_id'], $_POST['status']);
+    });
 
     // Chat
     $router->get('/chats/{user_id}', function($user_id) use ($view, $auth) {

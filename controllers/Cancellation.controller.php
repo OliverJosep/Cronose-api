@@ -8,4 +8,8 @@ class CancellationController {
     return CancellationDAO::getAll($lang);
   }
 
+  public static function get($id, $lang) {
+    return CancellationDAO::get($id, $lang);
+  }
+
 }

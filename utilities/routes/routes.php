@@ -7,11 +7,11 @@ $router = new Router();
 require_once '../utilities/View.php';
 $view = new View();
 
-// TODO API authentication
+// API authentication
 require_once 'authRoutes.php';
 $auth = (isset($_REQUEST['jwt'])) ? validateJWT($_REQUEST['jwt']) :  false;
 
-
+// Langs
 $avaliable_langs = ['ca','es','en'];
 $url = explode("/", trim($_SERVER['REQUEST_URI'], "/"));
 

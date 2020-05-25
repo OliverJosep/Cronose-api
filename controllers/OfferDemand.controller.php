@@ -2,6 +2,7 @@
 
 require_once '../dao/OfferDemand.dao.php';
 require_once 'Offer.controller.php';
+require_once 'Cancellation.controller.php';
 
 class OfferDemandController {
 
@@ -12,7 +13,11 @@ class OfferDemandController {
   public static function getAllCards($worker_id, $client_id, $lang) {
     $cards = OfferDemandDAO::getAllCards($worker_id, $client_id);
     foreach ($cards as $value => &$key) {
+      $key['worker'] = UserController::getBasicUserById($key['worker_id'], $lang);
+      $key['client'] = UserController::getBasicUserById($key['client_id'], $lang);
+      $key['cancellation_policy'] = CancellationController::get($key["cancellation_policy_id"], $lang);
       $key['offer'] = OfferController::getOfferById($key['worker_id'],$key['specialization_id'],$lang, false);
+      unset($key["cancellation_policy_id"], $key["worker_id"], $key["client_id"]);
     }
     return $cards;
   }
@@ -30,6 +35,10 @@ class OfferDemandController {
     if (!OfferDemandDAO::createDemands($worker_id, $client_id, $specialization_id)) return;
     $demand_id = OfferDemandDAO::getDemandsId($worker_id, $client_id, $specialization_id)['id'];
     return OfferDemandDAO::createCard($work_date, $cancellation_policy, $demand_id, $qr_code);
+  }
+
+  public static function updateCard($card_id, $status) {
+    return OfferDemandDAO::updateCard($card_id, $status);
   }
 
 }

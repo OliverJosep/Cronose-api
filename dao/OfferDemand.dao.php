@@ -6,7 +6,7 @@ require_once '../controllers/User.controller.php';
 class OfferDemandDAO extends DAO {
 
   public static function getCard($card_id) {
-    $sql = "SELECT *
+    $sql = "SELECT Card.id, Card.status, work_date, qr_code_id, demand_id, specialization_id, demanded_at, cancellation_policy_id, worker_id, client_id
             FROM Card, Demands 
             WHERE Card.demand_id = Demands.id
             AND Card.id = :card_id;";
@@ -57,7 +57,6 @@ class OfferDemandDAO extends DAO {
   public static function createCard($work_date, $cancellation_policy, $demand_id, $qr_code) {
     $sql = "INSERT INTO `Card` (`id`, `status`, `work_date`, `qr_code_id`, `cancellation_policy_id`, `demand_id`) 
             VALUES (NULL, 'pending', :work_date, :qr_code, :cancellation_policy, :demand_id)";
-        // return $sql;
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':work_date', $work_date, PDO::PARAM_STR);
     $statement->bindParam(':qr_code', $qr_code, PDO::PARAM_INT);
@@ -87,6 +86,16 @@ class OfferDemandDAO extends DAO {
     $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
     $statement->execute();
     return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public static function updateCard($card_id, $status) {
+    $sql = "UPDATE Card 
+            SET Card.status = :status
+            WHERE Card.id = :card_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':status', $status, PDO::PARAM_STR);
+    $statement->bindParam(':card_id', $card_id, PDO::PARAM_INT);
+    $statement->execute();
   }
 
 }
