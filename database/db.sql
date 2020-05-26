@@ -339,7 +339,7 @@ create table if not exists `Demands` (
 
 create table if not exists `Card` (
     id int auto_increment primary key not null,
-    status enum('pending','accepted','done','rejected') default 'pending' not null,
+    status enum('pending','accepted', 'valoration', 'done','rejected') default 'pending' not null,
     work_date datetime not null,
     qr_code_id int,
     cancellation_policy_id int not null,
@@ -417,8 +417,9 @@ create table if not exists `Valoration_Label_Language`(
     primary key(language_id, valoration_label_id)
 )ENGINE = InnoDB;
 
-create table if not exists `Comment` (
-    id int auto_increment primary key not null
+/*create table if not exists `Comment` (
+    id int auto_increment primary key not null,
+    text varchar(255) not null
 )ENGINE = InnoDB;
 
 create table if not exists `Comment_Language`(
@@ -428,26 +429,31 @@ create table if not exists `Comment_Language`(
     foreign key (language_id) references `Languages_Offerted`(id),
     foreign key (comment_id) references `Comment`(id),
     primary key(language_id, comment_id)
-)ENGINE = InnoDB;
+)ENGINE = InnoDB;*/
 
-create table if not exists `Worker_Valoration` (
+create table if not exists `Card_Valoration` (
     valoration_id int not null,
     card_id int not null,
-    comment_id int null,
-    puntuation int not null,
+    valorated_by int not null,
+    text varchar(512),
+    puntuation int,
+    date date,
     foreign key (valoration_id) references `Valoration_Label`(id),
     foreign key (card_id) references `Card`(id),
-    foreign key (comment_id) references `Comment`(id),
-    primary key (valoration_id, card_id)
+    foreign key (valorated_by) references `User`(id),
+    primary key (valoration_id, card_id, valorated_by)
 )ENGINE = InnoDB;
 
-create table if not exists `Client_Valoration` (
+create table if not exists `User_Valoration` (
     valoration_id int not null,
-    card_id int not null,
-    comment_id int null,
-    puntuation int not null,
+    user_id int not null,
+    valorated_by int not null,
+    roll enum('worker','client') not null,
+    text varchar(512),
+    puntuation int,
+    date date,
     foreign key (valoration_id) references `Valoration_Label`(id),
-    foreign key (card_id) references `Card`(id),
-    foreign key (comment_id) references `Comment`(id),
-    primary key (valoration_id,card_id)
+    foreign key (user_id) references `User`(id),
+    foreign key (valorated_by) references `User`(id),
+    primary key (valoration_id, user_id, valorated_by)
 )ENGINE = InnoDB;
