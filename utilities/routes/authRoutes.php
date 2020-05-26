@@ -53,10 +53,6 @@ class AuthorizedRoutes {
       if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
       OfferDemandController::updateCard($_POST['card_id'], $_POST['status']);
     });
-    $router->get('/cards/done', function() use ($view, $auth) {
-      if ($_GET['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
-      $view::json(OfferDemandController::checkCards($_GET['user_id']));
-    });
 
     // Chat
     $router->get('/chats/{user_id}', function($user_id) use ($view, $auth) {
@@ -84,6 +80,10 @@ class AuthorizedRoutes {
     $router->post('/offer', function() use ($view, $lang, $auth) {
       if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
       return $view::json(OfferController::setNewOffer($lang, $_POST['user_id'], $_POST['specialization_id'], $_POST['offerTitle'], $_POST['offerDescription']));
+    });
+    $router->get('/cards/done', function() use ($view, $lang, $auth) {
+      if ($_GET['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
+      $view::json(OfferDemandController::checkCards($_GET['user_id'], $lang));
     });
 
   }

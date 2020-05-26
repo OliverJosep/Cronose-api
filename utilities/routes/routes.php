@@ -246,9 +246,13 @@ $router->mount('/seniority', function() use ($router, $view) {
   });
 });
 
-// Valoration
+// Valorations
 $router->get('/valorations/{user_id}/{specialization_id}', function($user_id, $specialization_id) use ($view) {
   $view::json(ValorationController::getWorkerValorations($user_id, $specialization_id));
+});
+$router->post('/valorations', function() use ($view) {
+  $view::json(ValorationController::createValorations());
+  
 });
 
 // Error 404
