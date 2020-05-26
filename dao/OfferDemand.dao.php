@@ -9,13 +9,26 @@ class OfferDemandDAO extends DAO {
     $sql = "SELECT Card.id, Card.status, work_date, qr_code_id, demand_id, specialization_id, demanded_at, cancellation_policy_id, worker_id, client_id
             FROM Card, Demands 
             WHERE Card.demand_id = Demands.id
-            AND Card.id = :card_id;";
+            AND Card.id = :card_id";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':card_id', $card_id, PDO::PARAM_INT);
     $statement->execute();
-    $card = $statement->fetch(PDO::FETCH_ASSOC);
-    return $card;
+    return $statement->fetch(PDO::FETCH_ASSOC);
   }
+
+  public static function getClientCard($card_id, $user_id) {
+    $sql = "SELECT Card.id, Card.status, work_date, qr_code_id, demand_id, specialization_id, demanded_at, cancellation_policy_id, worker_id, client_id
+            FROM Card, Demands 
+            WHERE Card.demand_id = Demands.id
+            AND Card.id = :card_id
+            AND Demands.client_id = :user_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':card_id', $card_id, PDO::PARAM_INT);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
 
   public static function getAllCards($worker_id, $client_id) {
     $sql = "SELECT Card.id FROM Card,Demands 

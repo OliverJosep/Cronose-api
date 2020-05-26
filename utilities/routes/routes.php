@@ -250,9 +250,8 @@ $router->mount('/seniority', function() use ($router, $view) {
 $router->get('/valorations/{user_id}/{specialization_id}', function($user_id, $specialization_id) use ($view) {
   $view::json(ValorationController::getWorkerValorations($user_id, $specialization_id));
 });
-$router->post('/valorations', function() use ($view) {
-  $view::json(ValorationController::createValorations());
-  
+$router->post('/valoration', function() use ($view) {
+  $view::json(ValorationController::updateValoration());
 });
 
 // Error 404

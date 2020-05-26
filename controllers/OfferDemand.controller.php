@@ -15,6 +15,17 @@ class OfferDemandController {
     return $card;
   }
 
+  
+  public static function getClientCard($card_id, $user_id ,$lang = null) {
+    $card = OfferDemandDAO::getClientCard($card_id, $user_id, $lang);
+    if (!$card) return;
+    $card['worker'] = UserController::getBasicUserById($card['worker_id']);
+    $card['client'] = UserController::getBasicUserById($card['client_id']);
+    $card['offer'] =  OfferController::getOfferById($card['worker_id'],$card['specialization_id'],$lang, false);
+    unset($card["worker_id"], $card["client_id"]);
+    return $card;
+  }
+
   public static function getAllCards($worker_id, $client_id, $lang) {
     $cards = OfferDemandDAO::getAllCards($worker_id, $client_id);
     foreach ($cards as $value => &$key) {
@@ -50,15 +61,16 @@ class OfferDemandController {
     $cards = OfferDemandDAO::checkCards($user_id);
     foreach ($cards as $value => $key) {
       if ($key['status'] === "accepted") {
-        ValorationController::createValorations($key, $lang);
-        OfferDemandDAO::updateCard($key['id'], "done");
-      } else {
-        OfferDemandDAO::updateCard($key['id'], "rejected");
+        ValorationController::createValoration($key, $lang);
+        self::updateCard($key['id'], "valoration");
+      } else if ($key['status'] !== "valoration") {
+        self::updateCard($key['id'], "rejected");
         unset($cards[$value]);
       }
+      $cards[$value] = self::getClientCard($key['id'], $user_id, $lang);
     }
-    return ValorationController::checkValorations($user_id);
-    // return $cards;
+    // return ValorationController::checkValorations($user_id);
+    return $cards;
   }
   
 }

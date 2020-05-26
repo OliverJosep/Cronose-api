@@ -27,12 +27,7 @@ class ValorationDAO extends DAO {
     return $valorations;
   }
 
-  public static function checkValorations($user_id) {
-    return ValorationDAO::checkValorations($user_id);
-
-  }
-
-  public static function createOfferValoration($card_id, $valorated_by, $text = null, $puntuation = null, $date = null, $valoration_id = 1) {
+  public static function createValoration($card_id, $valorated_by, $text = null, $puntuation = null, $date = null, $valoration_id = 1) {
     $sql = "INSERT INTO Card_Valoration VALUES (:valoration_id, :card_id, :valorated_by, :text, :puntuation, :date)";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':valoration_id', $valoration_id, PDO::PARAM_INT);
@@ -44,18 +39,17 @@ class ValorationDAO extends DAO {
     return $statement->execute();
   }
 
-  public static function createUserValoration($user_id, $valorated_by, $roll, $text = null, $puntuation = null, $date = null, $valoration_id = 1) {
-    $sql = "INSERT INTO User_Valoration VALUES (:valoration_id, :user_id, :valorated_by, :roll, :text, :puntuation, :date)";
+  public static function updateValoration($card_id, $valorated_by, $text = null, $puntuation = null, $valoration_id = 1) {
+    $sql = "UPDATE Card_Valoration 
+            SET text = :text, puntuation = :puntuation, date = date(now())
+            WHERE card_id = :card_id AND valorated_by = :valorated_by AND valoration_id = :valoration_id";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':valoration_id', $valoration_id, PDO::PARAM_INT);
-    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':card_id', $card_id, PDO::PARAM_INT);
     $statement->bindParam(':valorated_by', $valorated_by, PDO::PARAM_INT);
-    $statement->bindParam(':roll', $roll, PDO::PARAM_STR);
     $statement->bindParam(':text', $text, PDO::PARAM_STR);
     $statement->bindParam(':puntuation', $puntuation, PDO::PARAM_INT);
-    $statement->bindParam(':date', $date, PDO::PARAM_STR);
     return $statement->execute();
   }
-
 
 }
