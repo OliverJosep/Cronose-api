@@ -69,7 +69,6 @@ class OfferDemandController {
       }
       $cards[$value] = self::getClientCard($key['id'], $user_id, $lang);
     }
-    // return ValorationController::checkValorations($user_id);
     return $cards;
   }
   

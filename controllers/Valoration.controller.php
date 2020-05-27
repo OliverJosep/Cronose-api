@@ -18,4 +18,12 @@ class ValorationController {
     if ($valoration) OfferDemandController::updateCard($_POST['card_id'], 'done');
   }
 
+  public static function getOfferValorations($user_id, $specialization_id) {
+    $valorations = ValorationDAO::getOfferValorations($user_id, $specialization_id);
+    foreach ($valorations as &$valoration) {
+      $valoration['valorated_by'] = UserController::getBasicUserById($valoration['valorated_by'], false, true);
+    }
+    return $valorations;
+  }
+
 }

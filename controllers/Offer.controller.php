@@ -93,6 +93,7 @@ class OfferController {
     $offer = array('user' => UserController::getBasicUserById($offer['user_id'], $lang, true)) + $offer;
     $offer['translations'] = self::getOfferLangs($offer['user_id'], $offer['specialization_id']);
     $offer['translations'] = Language::orderByLang($lang, $offer['translations']);
+    $offer['valorations'] = ValorationController::getOfferValorations($offer['user']['id'], $offerEsp);
     unset($offer['user_id']);
     return $offer;
   }

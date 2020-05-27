@@ -41,7 +41,7 @@ class ValorationDAO extends DAO {
 
   public static function updateValoration($card_id, $valorated_by, $text = null, $puntuation = null, $valoration_id = 1) {
     $sql = "UPDATE Card_Valoration 
-            SET text = :text, puntuation = :puntuation, date = date(now())
+            SET text = :text, puntuation = :puntuation, date = now()
             WHERE card_id = :card_id AND valorated_by = :valorated_by AND valoration_id = :valoration_id";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':valoration_id', $valoration_id, PDO::PARAM_INT);
@@ -50,6 +50,22 @@ class ValorationDAO extends DAO {
     $statement->bindParam(':text', $text, PDO::PARAM_STR);
     $statement->bindParam(':puntuation', $puntuation, PDO::PARAM_INT);
     return $statement->execute();
+  }
+
+  public static function getOfferValorations($user_id, $specialization_id) {
+    $sql = "SELECT valorated_by, text, puntuation, date FROM Card_Valoration, Card, Demands, Offer
+            WHERE Card_Valoration.card_id = Card.id
+            AND Card.demand_id = Demands.id
+            AND Demands.worker_id = Offer.user_id
+            AND Demands.specialization_id = Offer.specialization_id
+            AND Offer.user_id = :user_id
+            AND Offer.specialization_id = :specialization_id
+            ORDER BY Card_Valoration.date DESC";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
 }
