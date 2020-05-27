@@ -12,8 +12,9 @@ class MediaDAO extends DAO {
   }
 
   public static function getById($id) {
-    $sql = "SELECT * FROM Media WHERE Media.id = ${id}";
+    $sql = "SELECT * FROM Media WHERE Media.id = :id";
     $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':id', $id, PDO::PARAM_INT);
     $statement->execute();
     return $statement->fetch(PDO::FETCH_ASSOC);
   }

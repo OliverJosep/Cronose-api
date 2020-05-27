@@ -57,9 +57,6 @@ class OfferDAO extends DAO {
   return $statement->fetch(PDO::FETCH_ASSOC);
 }
 
-
-  // ---------------------------------
-
   public static function getAllOffers() {
     $sql = "SELECT Offer.user_id, Offer.specialization_id, User.initials, User.tag, User.name, User.surname, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg, Offer.visibility 
       FROM User,Offer 
@@ -70,8 +67,6 @@ class OfferDAO extends DAO {
   }
 
   public static function getOffersByUser($user_id, $visibility) {
-    // if ($visibility) return 'hol';
-    // return $visibility;
     $sql = "SELECT Offer.user_id, Offer.specialization_id, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg, Offer.visibility 
       FROM Offer 
       WHERE Offer.user_id = :user_id";
@@ -111,7 +106,7 @@ class OfferDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function getOfferLangs($user_id, $specialization_id) {
+  public static function getOfferTranslations($user_id, $specialization_id) {
     $sql = "SELECT Offer_Language.language_id,Offer_Language.title,Offer_Language.description
       FROM Offer,Offer_Language 
       WHERE Offer.user_id = Offer_Language.user_id
@@ -135,19 +130,23 @@ class OfferDAO extends DAO {
     AND Offer.specialization_id = Offer_Language.specialization_id 
     AND Offer.specialization_id = Specialization.id  ";
 
-    if (isset($lang)) {
-      $langs = "AND (";
-      foreach ($lang as $key => $value) {
-        if ($key != 0) $langs .= "OR ";
-        $lang .= "Offer_Language.language_id = '${value}' ";
-      }
-      $sql .= $langs . ") ";
-    }
-    if ($category) $sql .=  "AND Specialization.category_id = ${category} ";
-    if ($specialization) $sql .=  "AND Specialization.id = ${specialization} ";
+    // if (isset($lang)) {
+    //   $langs = "AND (";
+    //   foreach ($lang as $key => $value) {
+    //     if ($key != 0) $langs .= "OR ";
+    //     $lang .= "Offer_Language.language_id = '${value}' ";
+    //   }
+    //   $sql .= $langs . ") ";
+    // }
+
+    if ($category) $sql .=  "AND Specialization.category_id = :category ";
+    if ($specialization) $sql .=  "AND Specialization.id = :specialization ";
     if ($text) $sql .=  "AND Offer_Language.title LIKE '%${text}%' ";
     $sql .= "GROUP BY Offer.user_id,Offer.specialization_id LIMIT :limit OFFSET :offset";
     $statement = self::$DB->prepare($sql);
+    if ($category) $statement->bindParam(':category', $category, PDO::PARAM_INT);
+    if ($specialization) $statement->bindParam(':specialization', $specialization, PDO::PARAM_INT);
+    if ($text) $statement->bindParam(':text', $text, PDO::PARAM_STR);
     $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
     $statement->bindParam(':limit', $limit, PDO::PARAM_INT);
     // return $sql;
@@ -178,9 +177,12 @@ class OfferDAO extends DAO {
     return $statement->execute();
   }
 
-  public static function getCoinPrice($sp){
-    $sql = "SELECT coin_price FROM Category, Specialization WHERE $sp = Specialization.id AND Specialization.category_id = Category.id;";
+  public static function getCoinPrice($specialization_id){
+    $sql = "SELECT coin_price FROM Category, Specialization 
+            WHERE Specialization.id = :specialization_id 
+            AND Specialization.category_id = Category.id;";
     $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
     $statement->execute();
     return $statement->fetch(PDO::FETCH_ASSOC);
   }

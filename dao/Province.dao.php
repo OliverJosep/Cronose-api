@@ -6,7 +6,7 @@ class ProvinceDAO extends DAO {
 
   public static function getAll(){
     $sql = "SELECT Province.id, Province.name 
-      FROM Province";
+            FROM Province";
     $statement = self::$DB->prepare($sql);
     $statement->execute();
     return $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -14,8 +14,8 @@ class ProvinceDAO extends DAO {
 
   public static function getById($id) {
     $sql = "SELECT Province.id, Province.name 
-      FROM Province 
-      WHERE Province.id = :id";
+            FROM Province 
+            WHERE Province.id = :id";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':id', $id, PDO::PARAM_INT);
     $statement->execute();

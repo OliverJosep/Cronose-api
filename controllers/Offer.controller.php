@@ -11,10 +11,7 @@ class OfferController {
   public static function getAllOffers($lang) {
     $offers[] = OfferDAO::getAllOffers();
     foreach ($offers as $key => $value) {
-      $offers[$key]['translations'] = self::getOfferLangs($value['user_id'], $value['specialization_id']);
-    }
-    foreach ($offers as $key => $value) {
-      $offers[$key]['translations'] = Language::orderByLang($lang, $value['translations']);
+      $offers[$key]['translations'] = self::getOfferTranslations($value['user_id'], $value['specialization_id'], $lang);
     }
     return $offers;
   }
@@ -23,43 +20,9 @@ class OfferController {
     $offers = OfferDAO::getOffersByUser($user_id, $visibility);
     foreach ($offers as $key => $value) {
       $offers[$key]['user'] = UserController::getBasicUserById($value['user_id'], false, true);
-      $offers[$key]['translations'] = self::getOfferLangs($user_id, $value['specialization_id']);
+      $offers[$key]['translations'] = self::getOfferTranslations($user_id, $value['specialization_id'], $lang);
       unset($offers[$key]['user_id']);
     }
-    foreach ($offers as $key => $value) {
-      $offers[$key]['translations'] = Language::orderByLang($lang, $value['translations']);
-    }
-    // $offers['user'] = UserController::getBasicUserById($user_id, false, true);
-    return $offers;
-  }
-
-  public static function getOffersByLang($limit, $offset, $lang) {
-    $offers = OfferDAO::getOffersByLang($limit, $offset, $lang);
-
-    foreach ($offers as $key => $value) {
-      $offers[$key]['translations'] = self::getOfferLangs($value['user_id'], $value['specialization_id']);
-    }
-
-    foreach ($offers as $key => $value) {
-      $offers[$key]['translations'] = Language::orderByLang($lang, $value['translations']);
-    }
-    
-    return $offers;
-  }
-
-  public static function getOffersDefaultLang($limit, $offset, $lang) {
-    $offers = OfferDAO::getOffers($limit, $offset);
-
-    foreach ($offers as $key => $value) {
-      $offers[$key]['user'] = UserController::getBasicUserById($value['user_id'], false, true);
-      $offers[$key]['translations'] = self::getOfferLangs($value['user_id'], $value['specialization_id']);
-      unset($offers[$key]['user_id']);
-    }
-
-    foreach ($offers as $key => $value) {
-      $offers[$key]['translations'] = Language::orderByLang($lang, $value['translations']);
-    }
-
     return $offers;
   }
 
@@ -72,26 +35,16 @@ class OfferController {
 
     foreach ($offers as $key => $value) {
       $offers[$key]['user'] = UserController::getBasicUserById($value['user_id'], false , true);
-      $offers[$key]['translations'] = self::getOfferLangs($value['user_id'], $value['specialization_id']);
+      $offers[$key]['translations'] = self::getOfferTranslations($value['user_id'], $value['specialization_id'], $_GET['defaultLang']);
       unset($offers[$key]['user_id']);
     }
-
-    foreach ($offers as $key => $value) {
-      $offers[$key]['translations'] = Language::orderByLang($_GET['defaultLang'], $value['translations']);
-    }
-
     return $offers;
-  }
-
-  public static function getOffersByIdAndLang($id, $lang) {
-    return OfferDAO::getOffersByIdAndLang($id, $lang);
   }
 
   public static function getOffer($userInitials,$userTag,$offerEsp,$lang) {
     $offer = OfferDAO::getOffer($userInitials,$userTag,$offerEsp);
     $offer = array('user' => UserController::getBasicUserById($offer['user_id'], $lang, true)) + $offer;
-    $offer['translations'] = self::getOfferLangs($offer['user_id'], $offer['specialization_id']);
-    $offer['translations'] = Language::orderByLang($lang, $offer['translations']);
+    $offer['translations'] = self::getOfferTranslations($offer['user_id'], $offer['specialization_id'], $lang);
     $offer['valorations'] = ValorationController::getOfferValorations($offer['user']['id'], $offerEsp);
     unset($offer['user_id']);
     return $offer;
@@ -100,30 +53,27 @@ class OfferController {
   public static function getOfferById($userId,$offerEsp,$lang, $user = true) {
     $offer = OfferDAO::getOfferById($userId,$offerEsp);
     if ($user) $offer = array('user' => UserController::getBasicUserById($offer['user_id'], $lang, true)) + $offer;
-    $offer['translations'] = self::getOfferLangs($offer['user_id'], $offer['specialization_id']);
-    $offer['translations'] = Language::orderByLang($lang, $offer['translations']);
+    $offer['translations'] = self::getOfferTranslations($offer['user_id'], $offer['specialization_id'], $lang);
     unset($offer['user_id']);
     return $offer;
   }
 
+  // Create new Offer
   // TODO retornar error si ja hi ha una oferta amb aquest especialització
   public static function setNewOffer($lang, $user_id, $specialization_id, $offerTitle, $offerDescription){
     echo OfferDAO::setNewOffer($user_id, $specialization_id);
     echo OfferDAO::setNewOfferLang($lang, $user_id, $specialization_id, $offerTitle, $offerDescription);
   }
 
-  public static function getNewOffer(){
-    return $offer;
-  }
-
-  // --------------------------------
-
-  public static function getOfferLangs($user_id, $specialization_id) {
-    return OfferDAO::getOfferLangs($user_id, $specialization_id);
+  // Get and update translations
+  public static function getOfferTranslations($user_id, $specialization_id, $lang = null) {
+    $translations = OfferDAO::getOfferTranslations($user_id, $specialization_id);
+    if ($lang) $translations = Language::orderByLang($lang, $translations);
+    return $translations;
   }
 
   public static function getTranslations($data) {
-    $translations = self::getOfferLangs($data['user_id'], $data['specialization_id']);
+    $translations = self::getOfferTranslations($data['user_id'], $data['specialization_id']);
     if (count($translations) == 0) return null;
     if (count($translations) == 3) return $translations;
     $langs = [
@@ -146,8 +96,8 @@ class OfferController {
     if ($translations['title'] != $data['title'] || $translations['title'] != $data['description']) return OfferDAO::updateTranslation($data['user_id'], $data['specialization_id'], $data['lang'], $data['title'], $data['description']);
     return $translations;
   }
-// -----------------------------------------------------
 
+  // Visibility
   public static function getVisibility($data) {
     return OfferDAO::getVisibility($data['user_id'], $data['specialization_id']);
   }
@@ -160,3 +110,30 @@ class OfferController {
   }
 
 }
+
+
+  // public static function getOffersByLang($limit, $offset, $lang) {
+  //   $offers = OfferDAO::getOffersByLang($limit, $offset, $lang);
+
+  //   foreach ($offers as $key => $value) {
+  //     $offers[$key]['translations'] = self::getOfferTranslations($value['user_id'], $value['specialization_id'], $lang);
+  //   }
+    
+  //   return $offers;
+  // }
+
+  // public static function getOffersDefaultLang($limit, $offset, $lang) {
+  //   $offers = OfferDAO::getOffers($limit, $offset);
+
+  //   foreach ($offers as $key => $value) {
+  //     $offers[$key]['user'] = UserController::getBasicUserById($value['user_id'], false, true);
+  //     $offers[$key]['translations'] = self::getOfferTranslations($value['user_id'], $value['specialization_id'], $lang);
+  //     unset($offers[$key]['user_id']);
+  //   }
+
+  //   return $offers;
+  // }
+
+  // public static function getOffersByIdAndLang($id, $lang) {
+  //   return OfferDAO::getOffersByIdAndLang($id, $lang);
+  // }

@@ -67,9 +67,9 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
     $router->get('/all/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
       $view::json(OfferController::getOffersDefaultLang($limit, $offset, $lang));
     });
-    $router->get('/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
-      $view::json(OfferController::getOffersByLang($limit, $offset, $lang));
-    });
+    // $router->get('/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
+    //   $view::json(OfferController::getOffersByLang($limit, $offset, $lang));
+    // });
   });
 
   // Achievements

@@ -5,7 +5,7 @@ require_once '../dao/Achievement.dao.php';
 class AchievementController {
 
   public static function getAll() {
-  	$achievements = AchievementDAO::getAll();
+    $achievements = AchievementDAO::getAll();
     $langs = LanguageController::getLangs();
     foreach ($achievements as &$achievement) {
       foreach($langs as $lang) {
@@ -16,7 +16,7 @@ class AchievementController {
   }
 
   public static function getAllByLang($lang) {
-  	return AchievementDAO::getAllByLang($lang);
+    return AchievementDAO::getAllByLang($lang);
   }
 
   public static function getById($id, $lang) {
@@ -24,7 +24,7 @@ class AchievementController {
   }
 
   public static function getAllByUser($id) {
-  	return AchievementDAO::getAllByUser($id);
+    return AchievementDAO::getAllByUser($id);
   }
 
   public static function getDescription($lang) {

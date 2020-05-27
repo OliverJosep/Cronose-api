@@ -49,15 +49,6 @@ class UserDAO extends DAO {
       : "${user['name']} ${user['surname']} ${user['surname_2']}";
     if ($user['private']) unset($user['name'], $user['surname'], $user['surname_2']);
   }
-
-  public static function getUserDescription($user_id) {
-    $sql = "SELECT language_id, description FROM User_Language WHERE user_id = :user_id ";
-    $statement = self::$DB->prepare($sql);
-    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-    $statement->execute();
-    return $statement->fetchAll(PDO::FETCH_ASSOC);    
-  }
-
   public static function getAuthData($email, $password) {
     $sql = "SELECT id, initials, tag, email FROM User WHERE email = :email AND password = :password";
     $statement = self::$DB->prepare($sql);
@@ -118,6 +109,14 @@ class UserDAO extends DAO {
     return $user;
   }
 
+  public static function getIdByEmail($email) {
+    $sql = "SELECT id FROM User WHERE email = :email;";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
   public static function getUserById($id) {
     $fields = self::$returnFields;
     $sql = "SELECT ${fields} FROM User WHERE id = :id";
@@ -127,16 +126,6 @@ class UserDAO extends DAO {
     $user = $statement->fetch(PDO::FETCH_ASSOC);
     self::getUserCompleteData($user);
     return $user;
-  }
-
-  public static function getPassword($email) {
-    $fields = self::$returnFields;
-    $sql = "SELECT password,validated,${fields} FROM User WHERE email = :email";
-    $statement = self::$DB->prepare($sql);
-    $statement->bindParam(':email', $email, PDO::PARAM_STR);
-    $statement->execute();
-    $password = $statement->fetch(PDO::FETCH_ASSOC);
-    return $password;
   }
 
   public static function getBasicUserById($id, $lang, $avatar) {
@@ -164,6 +153,7 @@ class UserDAO extends DAO {
     return $users;
   }
 
+  // Create / update user
   public static function saveUser($user, $fiels) {
 
     /* NAME */
@@ -248,14 +238,19 @@ class UserDAO extends DAO {
     $statement->execute();
   }
 
-  public static function getIdByEmail($email) {
-    $sql = "SELECT id FROM User WHERE email = :email;";
+  public static function updateUser($email, $city_cp, $private, $user_id) {
+    $sql = "UPDATE User 
+            SET email = :email, city_cp = :city_cp, private = :private 
+            WHERE User.id = :user_id";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->bindParam(':city_cp', $city_cp, PDO::PARAM_INT);
+    $statement->bindParam(':private', $private, PDO::PARAM_INT);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $statement->execute();
-    return $statement->fetch(PDO::FETCH_ASSOC);
   }
-  
+
+  // Exists
   public static function existsDNI($dni) {
     $sql = "SELECT DNI FROM User 
             WHERE User.dni = :dni";
@@ -274,46 +269,13 @@ class UserDAO extends DAO {
     return $statement->fetch(PDO::FETCH_ASSOC);
   }
 
-
-  public static function resetPasswordToken($password, $token) {
-    $sql = "UPDATE User,Token 
-            SET User.password = :password
-            WHERE User.id = Token.user_id 
-            AND Token.token = :token";
-    $statement = self::$DB->prepare($sql);
-    $statement->bindParam(':password', $password, PDO::PARAM_STR);
-    $statement->bindParam(':token', $token, PDO::PARAM_STR);
-    $statement->execute();
-  }
-
-  public static function updatePassword($password, $user_id) {
-    $sql = "UPDATE User
-            SET password = :password
-            WHERE id = :user_id";
-    $statement = self::$DB->prepare($sql);
-    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-    $statement->bindParam(':password', $password, PDO::PARAM_STR);
-    return $statement->execute();
-  }
-
-  public static function getPasswordByID($user_id) {
-    $sql = "SELECT password FROM User WHERE id = :user_id";
+  // User description
+  public static function getUserDescription($user_id) {
+    $sql = "SELECT language_id, description FROM User_Language WHERE user_id = :user_id ";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $statement->execute();
-    return $statement->fetch(PDO::FETCH_ASSOC);
-  }
-
-  public static function updateUser($email, $city_cp, $private, $user_id) {
-    $sql = "UPDATE User 
-            SET email = :email, city_cp = :city_cp, private = :private 
-            WHERE User.id = :user_id";
-    $statement = self::$DB->prepare($sql);
-    $statement->bindParam(':email', $email, PDO::PARAM_STR);
-    $statement->bindParam(':city_cp', $city_cp, PDO::PARAM_INT);
-    $statement->bindParam(':private', $private, PDO::PARAM_INT);
-    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-    $statement->execute();
+    return $statement->fetchAll(PDO::FETCH_ASSOC);    
   }
 
   public static function getDescription($user_id, $lang) {
@@ -351,4 +313,43 @@ class UserDAO extends DAO {
     return $statement->execute();
   }
 
+  // PASSWORD
+  public static function getPassword($email) {
+    $fields = self::$returnFields;
+    $sql = "SELECT password,validated,${fields} FROM User WHERE email = :email";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->execute();
+    $password = $statement->fetch(PDO::FETCH_ASSOC);
+    return $password;
+  }
+
+  public static function getPasswordByID($user_id) {
+    $sql = "SELECT password FROM User WHERE id = :user_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public static function updatePassword($password, $user_id) {
+    $sql = "UPDATE User
+            SET password = :password
+            WHERE id = :user_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':password', $password, PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  public static function resetPasswordToken($password, $token) {
+    $sql = "UPDATE User,Token 
+            SET User.password = :password
+            WHERE User.id = Token.user_id 
+            AND Token.token = :token";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':password', $password, PDO::PARAM_STR);
+    $statement->bindParam(':token', $token, PDO::PARAM_STR);
+    $statement->execute();
+  }
 }

@@ -27,8 +27,8 @@ class ImageDAO extends DAO {
     $statement->bindParam(':id', $id, PDO::PARAM_INT);
     $statement->execute();
     $sql = "SELECT id 
-      FROM DNI_Photo
-      WHERE media_id = :id";
+            FROM DNI_Photo
+            WHERE media_id = :id";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':id', $id, PDO::PARAM_INT);
     $statement->execute();
