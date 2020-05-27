@@ -125,7 +125,7 @@ class OfferDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function getFilteredOffers($category, $specialization, $text, $lang) {
+  public static function getFilteredOffers($category, $specialization, $text, $lang, $offset, $limit) {
     
     $sql = "SELECT Offer.user_id, Offer.specialization_id, User.initials, User.tag, User.name, User.surname, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg
     FROM Offer, Offer_Language, User, Specialization 
@@ -146,9 +146,11 @@ class OfferDAO extends DAO {
     if ($category) $sql .=  "AND Specialization.category_id = ${category} ";
     if ($specialization) $sql .=  "AND Specialization.id = ${specialization} ";
     if ($text) $sql .=  "AND Offer_Language.title LIKE '%${text}%' ";
-    $sql .= "GROUP BY Offer.user_id,Offer.specialization_id
-      LIMIT 10 OFFSET 0 ";
+    $sql .= "GROUP BY Offer.user_id,Offer.specialization_id LIMIT :limit OFFSET :offset";
     $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
+    $statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+    // return $sql;
     $statement->execute();
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }

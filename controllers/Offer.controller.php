@@ -64,12 +64,11 @@ class OfferController {
   }
 
   public static function getFilteredOffers() {
-    // $_GET['category'], $_GET['specialization'], $_GET['text'], $_GET['lang']
     $category = (isset($_GET['category'])) ? $_GET['category'] : null;
     $specialization = (isset($_GET['specialization'])) ? $_GET['specialization'] : null;
     $text = (isset($_GET['text'])) ? $_GET['text'] : null;
     $lang = (isset($_GET['lang'])) ? $_GET['lang'] : null;
-    $offers = OfferDAO::getFilteredOffers($category, $specialization, $text, $lang);
+    $offers = OfferDAO::getFilteredOffers($category, $specialization, $text, $lang, $_GET['offset'], $_GET['limit']);
 
     foreach ($offers as $key => $value) {
       $offers[$key]['user'] = UserController::getBasicUserById($value['user_id'], false , true);

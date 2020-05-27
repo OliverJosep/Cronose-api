@@ -204,6 +204,9 @@ $router->mount('/offer', function() use ($router, $view) {
 $router->get('/offers/filter', function() use ($view) {
   $view::json(OfferController::getFilteredOffers());
 });
+// $router->get('/offers/filter', function() use ($view) {
+//   $view::json(OfferController::getFilteredOffers());
+// });
 
 // Cards
 $router->mount('/cards', function() use ($router, $view) {
