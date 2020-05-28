@@ -18,7 +18,7 @@ class AuthorizedRoutes {
     // ! Change the extension of image files 
     $router->post('/avatar/update', function() use ($view, $auth)  {
       if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
-      $view::json(ImageController::updateImages($_POST['user_initials'], $_POST['user_tag'], $_FILES['avatar'], 'avatar'));
+      $view::json(ImageController::updateAvatar($_POST['user_initials'], $_POST['user_tag'], $_FILES['avatar'], 'avatar'));
     });
     $router->post('/avatar/visible', function() use ($view, $auth)  {
       if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));

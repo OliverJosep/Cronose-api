@@ -352,4 +352,29 @@ class UserDAO extends DAO {
     $statement->bindParam(':token', $token, PDO::PARAM_STR);
     $statement->execute();
   }
+
+  //Images
+  public static function haveAvatar($initials, $tag) {
+    $sql = "SELECT avatar_id, Media.url, Media.extension
+            FROM User, Media 
+            WHERE Media.id = User.avatar_id
+            AND initials = :initials AND tag = :tag";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':initials', $initials, PDO::PARAM_STR);
+    $statement->bindParam(':tag', $tag, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public static function setAvatar($initials, $tag, $avatar_id) {
+    $sql = "UPDATE User
+            SET avatar_id = :avatar_id
+            WHERE initials = :initials
+            AND tag = :tag";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':avatar_id', $avatar_id, PDO::PARAM_INT);
+    $statement->bindParam(':initials', $initials, PDO::PARAM_STR);
+    $statement->bindParam(':tag', $tag, PDO::PARAM_INT);
+    $statement->execute();
+  }
 }

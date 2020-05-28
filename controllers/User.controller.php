@@ -146,6 +146,14 @@ class UserController {
     return UserDAO::getPasswordByID($user_id);
   }
 
+  public static function haveAvatar($initials, $tag) {
+    return UserDAO::haveAvatar($initials, $tag);
+  }
+
+  public static function setAvatar($initials, $tag, $avatar_id) {
+    return UserDAO::setAvatar($initials, $tag, $avatar_id);
+  }
+
 }
 
 ?>
