@@ -154,13 +154,14 @@ class OfferDAO extends DAO {
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function setNewOffer($user_id, $specialization_id){
+  public static function setNewOffer($user_id, $specialization_id, $personal_valoration){
     $coin = self::getCoinPrice($specialization_id);
     $sql = "INSERT INTO `Offer` 
-    VALUES (:user_id, :specialization_id, 90, 100, :coin_price, now(), 1) ";
+            VALUES (:user_id, :specialization_id, 90, :personal_valoration, :coin_price, now(), 1) ";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $statement->bindParam(':specialization_id', $specialization_id, PDO::PARAM_INT);
+    $statement->bindParam(':personal_valoration', $personal_valoration, PDO::PARAM_INT);
     $statement->bindParam(':coin_price', $coin['coin_price'], PDO::PARAM_STR);
     return $statement->execute();
   }

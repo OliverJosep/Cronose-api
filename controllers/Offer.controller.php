@@ -60,9 +60,9 @@ class OfferController {
 
   // Create new Offer
   // TODO retornar error si ja hi ha una oferta amb aquest especialització
-  public static function setNewOffer($lang, $user_id, $specialization_id, $offerTitle, $offerDescription){
-    echo OfferDAO::setNewOffer($user_id, $specialization_id);
-    echo OfferDAO::setNewOfferLang($lang, $user_id, $specialization_id, $offerTitle, $offerDescription);
+  public static function setNewOffer($lang, $user_id, $specialization_id, $personal_valoration, $offerTitle, $offerDescription){
+    OfferDAO::setNewOffer($user_id, $specialization_id, $personal_valoration);
+    return OfferDAO::setNewOfferLang($lang, $user_id, $specialization_id, $offerTitle, $offerDescription);
   }
 
   // Get and update translations

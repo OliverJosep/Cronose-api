@@ -320,7 +320,8 @@ INSERT INTO DNI_Photo VALUES (1, 'accepted', 1);
 
 -- INSERT INTO `Change_Seniority` VALUES (2,1,date(now())),(1,2,date(now()));
 
-INSERT INTO `User` (`id`, `dni`, `name`, `surname`, `surname_2`, `email`, `password`, `tag`, `initials`, `coins`, `registration_date`, `points`, `private`, `city_cp`, `province_id`, `avatar_id`, `dni_photo_id`, `validated`) VALUES (NULL, '41617662J', 'Josep', 'Oliver', 'Sanso', 'josep.oliverr@gmail.com', '', '1313', 'JOS', '0.00', '2020-05-01', '0', '0', '7500', '1', NULL, '1', '1');
+INSERT INTO `User` (`id`, `dni`, `name`, `surname`, `surname_2`, `email`, `password`, `tag`, `initials`, `coins`, `registration_date`, `points`, `private`, `city_cp`, `province_id`, `avatar_id`, `dni_photo_id`, `validated`) 
+VALUES (NULL, '41617662J', 'Josep', 'Oliver', 'Sanso', 'josep.oliverr@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', '1313', 'JOS', '0.00', '2020-05-01', '0', '0', '7500', '1', NULL, '1', '1');
 
 INSERT INTO `Cancellation_Policy` () VALUES (),(),(),();
 INSERT INTO `Cancellation_Language` (`language_id`, `cancellation_policy_id`, `name`, `description`) 
