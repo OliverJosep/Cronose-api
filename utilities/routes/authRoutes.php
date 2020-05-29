@@ -79,7 +79,7 @@ class AuthorizedRoutes {
 
     $router->post('/offer', function() use ($view, $lang, $auth) {
       if ($_POST['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
-      return $view::json(OfferController::setNewOffer($lang, $_POST['user_id'], $_POST['specialization_id'], $_POST['p_val'], $_POST['offerTitle'], $_POST['offerDescription']));
+      return $view::json(OfferController::setNewOffer($lang, $_POST['user_id'], $_POST['specialization_id'], $_POST['p_val'], $_POST['offerTitle'], $_POST['offerDescription'], $_FILES));
     });
     $router->get('/cards/done', function() use ($view, $lang, $auth) {
       if ($_GET['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));

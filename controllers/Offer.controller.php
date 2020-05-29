@@ -21,6 +21,7 @@ class OfferController {
     foreach ($offers as $key => $value) {
       $offers[$key]['user'] = UserController::getBasicUserById($value['user_id'], false, true);
       $offers[$key]['translations'] = self::getOfferTranslations($user_id, $value['specialization_id'], $lang);
+      $offers[$key]['images'] = MediaDAO::getMedia($user_id, $value['specialization_id']);
       unset($offers[$key]['user_id']);
     }
     return $offers;
@@ -36,6 +37,7 @@ class OfferController {
     foreach ($offers as $key => $value) {
       $offers[$key]['user'] = UserController::getBasicUserById($value['user_id'], false , true);
       $offers[$key]['translations'] = self::getOfferTranslations($value['user_id'], $value['specialization_id'], $_GET['defaultLang']);
+      $offers[$key]['images'] = MediaDAO::getMedia($value['user_id'], $value['specialization_id']);
       unset($offers[$key]['user_id']);
     }
     return $offers;
@@ -45,6 +47,7 @@ class OfferController {
     $offer = OfferDAO::getOffer($userInitials,$userTag,$offerEsp);
     $offer = array('user' => UserController::getBasicUserById($offer['user_id'], $lang, true)) + $offer;
     $offer['translations'] = self::getOfferTranslations($offer['user_id'], $offer['specialization_id'], $lang);
+    $offer['images'] = MediaDAO::getMedia($offer['user_id'], $offer['specialization_id']);
     $offer['valorations'] = ValorationController::getOfferValorations($offer['user']['id'], $offerEsp);
     unset($offer['user_id']);
     return $offer;
@@ -60,8 +63,9 @@ class OfferController {
 
   // Create new Offer
   // TODO retornar error si ja hi ha una oferta amb aquest especialització
-  public static function setNewOffer($lang, $user_id, $specialization_id, $personal_valoration, $offerTitle, $offerDescription){
+  public static function setNewOffer($lang, $user_id, $specialization_id, $personal_valoration, $offerTitle, $offerDescription,$files){
     OfferDAO::setNewOffer($user_id, $specialization_id, $personal_valoration);
+    MediaController::insertOfferMedia($user_id,$specialization_id,$files);
     return OfferDAO::setNewOfferLang($lang, $user_id, $specialization_id, $offerTitle, $offerDescription);
   }
 
