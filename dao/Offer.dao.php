@@ -121,14 +121,13 @@ class OfferDAO extends DAO {
   }
 
   public static function getFilteredOffers($category, $specialization, $text, $lang, $offset, $limit) {
+    if ($text) $text = "%".$text."%";
     
-    $sql = "SELECT Offer.user_id, Offer.specialization_id, User.initials, User.tag, User.name, User.surname, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg
-    FROM Offer, Offer_Language, User, Specialization 
-    WHERE Offer.visibility = true 
-    AND User.id = Offer.user_id 
-    AND Offer.user_id = Offer_Language.user_id 
-    AND Offer.specialization_id = Offer_Language.specialization_id 
-    AND Offer.specialization_id = Specialization.id  ";
+    $sql = "SELECT Offer.user_id, Offer.specialization_id, User.initials, User.tag, User.name, User.surname, Offer.offered_at, Offer.coin_price, Offer.personal_valoration,Offer.valoration_avg 
+            FROM Offer, Offer_Language, User, Specialization 
+            WHERE Offer.visibility = true AND User.id = Offer.user_id 
+            AND Offer.user_id = Offer_Language.user_id AND Offer.specialization_id = Offer_Language.specialization_id 
+            AND Offer.specialization_id = Specialization.id ";
 
     // if (isset($lang)) {
     //   $langs = "AND (";
@@ -139,9 +138,9 @@ class OfferDAO extends DAO {
     //   $sql .= $langs . ") ";
     // }
 
-    if ($category) $sql .=  "AND Specialization.category_id = :category ";
-    if ($specialization) $sql .=  "AND Specialization.id = :specialization ";
-    if ($text) $sql .=  "AND Offer_Language.title LIKE '%${text}%' ";
+    if ($category) $sql .= "AND Specialization.category_id = :category ";
+    if ($specialization) $sql .= "AND Specialization.id = :specialization ";
+    if ($text) $sql .= "AND Offer_Language.title LIKE :text ";
     $sql .= "GROUP BY Offer.user_id,Offer.specialization_id LIMIT :limit OFFSET :offset";
     $statement = self::$DB->prepare($sql);
     if ($category) $statement->bindParam(':category', $category, PDO::PARAM_INT);
@@ -149,7 +148,6 @@ class OfferDAO extends DAO {
     if ($text) $statement->bindParam(':text', $text, PDO::PARAM_STR);
     $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
     $statement->bindParam(':limit', $limit, PDO::PARAM_INT);
-    // return $sql;
     $statement->execute();
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
