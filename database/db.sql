@@ -279,7 +279,7 @@ create table if not exists `Offer` (
     valoration_avg int(3) default 0 not null,
     personal_valoration int(3) default 0 not null,
     coin_price double(2,1) not null,
-    offered_at date not null,
+    offered_at timestamp not null,
     visibility boolean default true not null,
     foreign key (user_id) references `User`(id),
     foreign key (specialization_id) references `Specialization`(id),

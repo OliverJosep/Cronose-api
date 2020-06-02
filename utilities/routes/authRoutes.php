@@ -73,6 +73,11 @@ class AuthorizedRoutes {
         ChatController::sendMSG($sender_id, $receiver_id, $_POST['message'], $_POST['sended_date']);
       });
     });
+
+    // History
+    $router->get('/history', function() use ($view, $auth){
+      $view->json(CoinController::history($_GET['user_id'], $_GET['limit']));
+    });
   }
 
   public static function AuthRoutesLang($router, $url, $lang, $view, $auth) {

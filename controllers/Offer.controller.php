@@ -57,12 +57,12 @@ class OfferController {
     $offer = OfferDAO::getOfferById($userId,$offerEsp);
     if ($user) $offer = array('user' => UserController::getBasicUserById($offer['user_id'], $lang, true)) + $offer;
     $offer['translations'] = self::getOfferTranslations($offer['user_id'], $offer['specialization_id'], $lang);
+    $offer['images'] = MediaDAO::getMedia($offer['user_id'], $offer['specialization_id']);
     unset($offer['user_id']);
     return $offer;
   }
 
   // Create new Offer
-  // TODO retornar error si ja hi ha una oferta amb aquest especialització
   public static function setNewOffer($lang, $user_id, $specialization_id, $personal_valoration, $offerTitle, $offerDescription,$files){
     OfferDAO::setNewOffer($user_id, $specialization_id, $personal_valoration);
     MediaController::insertOfferMedia($user_id,$specialization_id,$files);

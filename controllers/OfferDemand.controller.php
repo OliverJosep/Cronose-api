@@ -62,6 +62,7 @@ class OfferDemandController {
     foreach ($cards as $value => $key) {
       if ($key['status'] === "accepted") {
         ValorationController::createValoration($key, $lang);
+        CoinController::pay($key['id']);
         self::updateCard($key['id'], "valoration");
       } else if ($key['status'] !== "valoration") {
         self::updateCard($key['id'], "rejected");

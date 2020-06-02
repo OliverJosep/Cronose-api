@@ -129,19 +129,10 @@ class OfferDAO extends DAO {
             AND Offer.user_id = Offer_Language.user_id AND Offer.specialization_id = Offer_Language.specialization_id 
             AND Offer.specialization_id = Specialization.id ";
 
-    // if (isset($lang)) {
-    //   $langs = "AND (";
-    //   foreach ($lang as $key => $value) {
-    //     if ($key != 0) $langs .= "OR ";
-    //     $lang .= "Offer_Language.language_id = '${value}' ";
-    //   }
-    //   $sql .= $langs . ") ";
-    // }
-
     if ($category) $sql .= "AND Specialization.category_id = :category ";
     if ($specialization) $sql .= "AND Specialization.id = :specialization ";
     if ($text) $sql .= "AND Offer_Language.title LIKE :text ";
-    $sql .= "GROUP BY Offer.user_id,Offer.specialization_id LIMIT :limit OFFSET :offset";
+    $sql .= "GROUP BY Offer.user_id,Offer.specialization_id ORDER BY Offer.offered_at DESC LIMIT :limit OFFSET :offset";
     $statement = self::$DB->prepare($sql);
     if ($category) $statement->bindParam(':category', $category, PDO::PARAM_INT);
     if ($specialization) $statement->bindParam(':specialization', $specialization, PDO::PARAM_INT);
