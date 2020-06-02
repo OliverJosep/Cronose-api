@@ -22,7 +22,7 @@ class CoinDAO extends DAO {
   }
 
   public static function history($user_id, $limit) {
-    $sql = "SELECT Card.id, Card.work_date, Demands.worker_id, Offer.coin_price 
+    $sql = "SELECT Card.id, DATE(Card.work_date) as date, Demands.worker_id, Offer.coin_price 
             FROM Card, Demands, Offer WHERE Card.demand_id = Demands.id 
             AND Demands.specialization_id = Offer.specialization_id AND Demands.worker_id = Offer.user_id
             AND (Demands.client_id = :user_id OR Demands.worker_id = :user_id) 

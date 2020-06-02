@@ -35,7 +35,7 @@ class OfferDemandDAO extends DAO {
             WHERE Demands.id = Card.demand_id
             AND ((Demands.client_id = :client_id AND Demands.worker_id = :worker_id) 
             OR (Demands.client_id = :worker_id AND Demands.worker_id = :client_id))
-            ORDER BY Demands.demanded_at DESC";
+            ORDER BY Card.work_date DESC";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':client_id', $client_id, PDO::PARAM_INT);
     $statement->bindParam(':worker_id', $worker_id, PDO::PARAM_INT);

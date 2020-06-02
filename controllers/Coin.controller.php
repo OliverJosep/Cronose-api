@@ -67,7 +67,6 @@ class CoinController {
     for ($i = 1; $i < count($history); $i++) {
       $coins = ($history[$i]['worker_id'] === $user_id) ? $history[$i - 1]['coin_price'] : ($history[$i - 1]['coin_price'] * -1);
       $history[$i]['coins'] = round($history[$i-1]['coins'] + $coins, 2);
-      
     }
     return $history;
   }
