@@ -73,11 +73,6 @@ class AuthorizedRoutes {
         ChatController::sendMSG($sender_id, $receiver_id, $_POST['message'], $_POST['sended_date']);
       });
     });
-
-    // History
-    $router->get('/history', function() use ($view, $auth){
-      $view->json(CoinController::history($_GET['user_id'], $_GET['limit']));
-    });
   }
 
   public static function AuthRoutesLang($router, $url, $lang, $view, $auth) {
@@ -89,6 +84,11 @@ class AuthorizedRoutes {
     $router->get('/cards/done', function() use ($view, $lang, $auth) {
       if ($_GET['user_id'] !== $auth['id']) return $view::json(array('Error' => 'Invalid user!'));
       $view::json(OfferDemandController::checkCards($_GET['user_id'], $lang));
+    });
+
+    // History
+    $router->get('/history', function() use ($view, $lang, $auth){
+      $view->json(CoinController::history($_GET['user_id'], $_GET['limit'], $lang));
     });
 
   }

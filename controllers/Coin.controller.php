@@ -60,11 +60,14 @@ class CoinController {
     return $card;
   }
 
-  public static function history($user_id, $limit) {
+  public static function history($user_id, $limit, $lang) {
+    
     $history = CoinDAO::history($user_id, $limit);
     if (count($history) === 0) return false;
-    $history[0]['coins'] = round(CoinDAO::getCoins($user_id), 2);    
+    $history[0]['card'] = OfferDemandController::getCard($history[0]['id'], $lang);
+    $history[0]['coins'] = round(CoinDAO::getCoins($user_id), 2);  
     for ($i = 1; $i < count($history); $i++) {
+      $history[$i]['card'] = OfferDemandController::getCard($history[$i]['id'], $lang);
       $coins = ($history[$i]['worker_id'] === $user_id) ? $history[$i - 1]['coin_price'] : ($history[$i - 1]['coin_price'] * -1);
       $history[$i]['coins'] = round($history[$i-1]['coins'] + $coins, 2);
     }
