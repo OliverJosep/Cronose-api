@@ -39,14 +39,45 @@ class UserController {
     return UserDAO::getAllWorksByUser($user_id);
   }
 
-  public static function getBasicUserById($id, $avatar = false) {
-    return UserDAO::getBasicUserById($id, $avatar);
+  public static function getBasicUserById($id, $lang = false, $avatar = false) {
+    return UserDAO::getBasicUserById($id, $lang, $avatar);
   }
 
-  public static function getUserDescription($user, $lang) {
-    $user['description'] = UserDAO::getUserDescription($user);
+  public static function getUserDescription($user, $lang = null) {
+    if (!is_array($user)) return self::getAllDescriptions($user);
+
+    $user['description'] = UserDAO::getUserDescription($user['id']);
+    if (!isset($user['description'][0])) return null;
     if ($lang) $user['description'] = Language::orderByLang($lang, $user['description']);
     return $user['description'];
+  }
+
+  public static function getAllDescriptions($user) {
+    $descriptions = UserDAO::getUserDescription($user);
+    if (count($descriptions) == 3) return $descriptions;
+    $langs = [
+      0 => 'es', 
+      1 => 'en', 
+      2 => 'ca'
+    ];
+    foreach ($langs as $key => $value) {
+      foreach ($descriptions as $description) {
+        if ($value === $description['language_id']) unset($langs[$key]);
+      }
+      if (isset($langs[$key])) array_push($descriptions, ['language_id' => $value, 'description' => '']);
+    }
+    return $descriptions;
+  }
+
+  public static function updateDescription($data) {
+    $user_id = $data['user_id'];
+    unset($data['user_id']);
+    foreach ($data as $key => $value) {
+      $description = UserDAO::getDescription($user_id, $key);
+      if ($description['description'] != $value) UserDAO::updateDescription($user_id, $value, $key);
+      if (!$description['description'] && $value != "") UserDAO::insertDescription($user_id, $value, $key);
+      if ($value === "") UserDAO::deleteDescription($user_id, $key);
+    }
   }
 
   public static function getAllDirections() {
@@ -69,10 +100,8 @@ class UserController {
   public static function userLogin($email, $password) {
     $user = UserDAO::getPassword($email);
     if ($user['password'] != $password) {
-      http_response_code(400);
       return ["message" => "Invalid email or password"];
     } else if ($user['validated'] != '1') {
-      http_response_code(400);
       return ["message" => "You have to validate yout email!"];
     }
     return [
@@ -81,12 +110,48 @@ class UserController {
     ];
   }
 
+  public static function getAuthData($email, $password) {
+    return UserDAO::getAuthData($email, $password);
+  }
+
   public static function validateUser($token) {
     UserDAO::validateUser($token);
   }
 
-  public static function resetPassword($token, $password) {
-    return UserDao::resetPassword($token, $password);
+  public static function existsDNI($dni) {
+    if (UserDAO::existsDNI($dni)) return true;
+    return false;
+  }
+
+  public static function existsEmail($email) {
+    if (UserDAO::existsEmail($email)) return true;
+    return false;
+  }
+
+  public static function resetPasswordToken($token, $password) {
+    return UserDAO::resetPasswordToken($token, $password);
+  }
+
+  public static function updateData($data) {
+    $private = isset($data['private']) ? true : false;
+    UserDAO::updateUser($data['email'], $data['city_cp'], $private, $data['user_id']);
+    return $data;
+  }
+
+  public static function updatePassword($password, $user_id) {
+    return UserDAO::updatePassword($password, $user_id);
+  }
+
+  public static function getPassword($user_id) {
+    return UserDAO::getPasswordByID($user_id);
+  }
+
+  public static function haveAvatar($initials, $tag) {
+    return UserDAO::haveAvatar($initials, $tag);
+  }
+
+  public static function setAvatar($initials, $tag, $avatar_id) {
+    return UserDAO::setAvatar($initials, $tag, $avatar_id);
   }
 
 }

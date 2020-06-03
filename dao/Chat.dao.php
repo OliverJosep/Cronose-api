@@ -20,9 +20,9 @@ class ChatDAO extends DAO {
     return $chat;
   }
 
-  public static function showChat($sender, $receiver, $offset, $limit) {
-    $chat['sender'] = self::getUserData($sender);
-    $chat['receiver'] = self::getUserData($receiver);
+  public static function showChat($sender, $receiver, $offset, $limit, $user) {
+    if ($user) $chat['sender'] = self::getUserData($sender);
+    if ($user) $chat['receiver'] = self::getUserData($receiver);
     $sql = "SELECT (select COUNT(*) > 0 from User where sender_id = id and id = :sender) as sended,sended_date,message 
             FROM Message 
             WHERE (sender_id = :sender AND receiver_id = :receiver) OR (sender_id = :receiver AND receiver_id = :sender) 
@@ -38,8 +38,8 @@ class ChatDAO extends DAO {
     return $chat;
   }
 
-  public static function sendMSG($sender, $receiver, $msg) {
-    $sql = "INSERT INTO Message VALUE(:sender, :receiver, now(), :msg);";
+  public static function sendMSG($sender, $receiver, $msg, $date) {
+    $sql = "INSERT INTO Message VALUE(:sender, :receiver, now(), :msg, 'pending');";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':sender', $sender, PDO::PARAM_INT);
     $statement->bindParam(':receiver', $receiver, PDO::PARAM_INT);
@@ -47,19 +47,29 @@ class ChatDAO extends DAO {
     $statement->execute();
   }
 
-  public static function showChats($receiver) {
-    $sql = "SELECT User.name,User.initials,User.tag 
-            FROM User,Message where User.id = sender_id 
-            AND receiver_id = :receiver 
-            GROUP BY sender_id;";
+  public static function showChats($user_id) {
+    $sql = "select distinct sender_id, receiver_id from Message where receiver_id = :user_id or sender_id = :user_id";
     $statement = self::$DB->prepare($sql);
-    $statement->bindParam(':receiver', $receiver, PDO::PARAM_INT);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $statement->execute();
     return $statement->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public static function getUserData($id) {
-    return UserController::getBasicUserById($id);
+  public static function getLastMessage($sender, $receiver) {
+    $sql = "SELECT (SELECT COUNT(*) > 0 FROM User WHERE sender_id = :sender) AS sended, Message.message, Message.sended_date, Message.satus
+            FROM Message WHERE (sender_id = :sender AND receiver_id = :receiver) 
+            OR (receiver_id = :sender AND sender_id = :receiver) 
+            ORDER BY sended_date DESC LIMIT 1";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':sender', $sender, PDO::PARAM_INT);
+    $statement->bindParam(':receiver', $receiver, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+
+  }
+
+  public static function getUserData($id, $avatar = true) {
+    return UserController::getBasicUserById($id, false, $avatar);
   }
 
 }

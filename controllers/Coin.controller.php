@@ -1,16 +1,17 @@
 <?php
 
 require_once '../controllers/User.controller.php';
-require_once '../controllers/WorkDemand.controller.php';
+require_once '../controllers/OfferDemand.controller.php';
 require_once '../controllers/Category.controller.php';
 require_once '../controllers/Specialization.controller.php';
+require_once '../dao/Coin.dao.php';
 
 class CoinController {
 
   public function getCoinHistory($user_id) {
     $actualCoin = UserController::getUserById($user_id);
     $actualCoin = $actualCoin['coins'];
-    $jobs = WorkDemandController::getAllByStatus($user_id, 'done');
+    $jobs = OfferDemandController::getAllByStatus($user_id, 'done');
     $history = [];
 
     foreach ($jobs as $job) {
@@ -49,6 +50,27 @@ class CoinController {
       $history[$job['id']]['work_demand'] = $work;
     }
 
+    return $history;
+  }
+
+  public static function pay($card_id){
+    $card = OfferDemandController::getCard($card_id);
+    CoinDAO::updateCoins($card['worker']['id'], $card['offer']['coin_price']);
+    CoinDAO::updateCoins($card['client']['id'], $card['offer']['coin_price']*-1);
+    return $card;
+  }
+
+  public static function history($user_id, $limit, $lang) {
+    
+    $history = CoinDAO::history($user_id, $limit);
+    if (count($history) === 0) return false;
+    $history[0]['card'] = OfferDemandController::getCard($history[0]['id'], $lang);
+    $history[0]['coins'] = round(CoinDAO::getCoins($user_id), 2);  
+    for ($i = 1; $i < count($history); $i++) {
+      $history[$i]['card'] = OfferDemandController::getCard($history[$i]['id'], $lang);
+      $coins = ($history[$i]['worker_id'] === $user_id) ? $history[$i - 1]['coin_price'] : ($history[$i - 1]['coin_price'] * -1);
+      $history[$i]['coins'] = round($history[$i-1]['coins'] + $coins, 2);
+    }
     return $history;
   }
 

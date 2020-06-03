@@ -7,7 +7,12 @@ $router = new Router();
 require_once '../utilities/View.php';
 $view = new View();
 
-$avaliable_langs = ['ca','es','en','it'];
+// API authentication
+require_once 'authRoutes.php';
+$auth = (isset($_REQUEST['jwt'])) ? validateJWT($_REQUEST['jwt']) :  false;
+
+// Langs
+$avaliable_langs = ['ca','es','en'];
 $url = explode("/", trim($_SERVER['REQUEST_URI'], "/"));
 
 # Url with a language
@@ -16,9 +21,15 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
   unset($url[0]);
   $_SERVER['REQUEST_URI'] = '/'.implode('/', $url);
 
-  // Categories
+  // Authenticated routes with lang
+  if (!isset($auth['error'])) echo AuthorizedRoutes::AuthRoutesLang($router, $url, $lang, $view, $auth);
+
+  // Categories 
   $router->get('/categories', function() use ($view, $lang) {
     $view::json(CategoryController::getAllByLang($lang));
+  });
+  $router->get('/category/{category_id}', function($category_id) use ($view, $lang) {
+    $view::json(SpecializationController::getByLangAndCategory($lang, $category_id));
   });
 
   // Specializations
@@ -26,8 +37,8 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
     $router->get('/', function() use ($view, $lang) {
       $view::json(SpecializationController::getAllByLang($lang));
     });
-    $router->get('/{category_id}', function($category_id) use ($view, $lang) {
-      $view::json(SpecializationController::getByLangAndCategory($lang, $category_id));
+    $router->get('/{specialization_id}', function($specialization_id) use ($view, $lang) {
+      $view::json(SpecializationController::getByLang($lang, $specialization_id));
     });
   });
 
@@ -39,22 +50,22 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
     $view::json(UserController::getUserByInitialsAndTag($initial, $tag, $lang)); // Get all user information with a default lang.
   });
 
-  // Work
-  $router->get('/work/{initials}/{tag}/{specialization}', function($initials, $tag, $specialization) use ($view, $lang) {
-    $view::json(WorkController::getWork($initials, $tag, $specialization, $lang));
+  // Offer
+  $router->get('/offer/{initials}/{tag}/{specialization}', function($initials, $tag, $specialization) use ($view, $lang) {
+    $view::json(OfferController::getOffer($initials, $tag, $specialization, $lang));
   });
-  $router->mount('/works', function() use ($router, $view, $lang) {
+  $router->mount('/offers', function() use ($router, $view, $lang) {
     $router->get('/', function() use ($view, $lang) {
-      $view::json(WorkController::getAllWorks($lang));
+      $view::json(OfferController::getAllOffers($lang));
     });
+    $router->get('/user/{user_id}/all', function($user_id) use ($view, $lang) {
+      $view::json(OfferController::getOffersByUser($user_id, $lang, false));
+    });  
     $router->get('/user/{user_id}', function($user_id) use ($view, $lang) {
-      $view::json(WorkController::getAllWorksByUser($user_id, $lang));
+      $view::json(OfferController::getOffersByUser($user_id, $lang));
     });  
     $router->get('/all/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
-      $view::json(WorkController::getWorksDefaultLang($limit, $offset, $lang));
-    });
-    $router->get('/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
-      $view::json(WorkController::getWorksByLang($limit, $offset, $lang));
+      $view::json(OfferController::getOffersDefaultLang($limit, $offset, $lang));
     });
   });
 
@@ -62,14 +73,27 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
   $router->get('/achievements', function() use ($view, $lang) {
     $view::json(AchievementController::getAllByLang($lang));
   });
+
+  // Cards
+  $router->get('/cards/{worker_id}/{client_id}', function($worker_id, $client_id) use ($view, $lang) {
+    $view::json(OfferDemandController::getAllCards($worker_id, $client_id, $lang));
+  });
+
+  // Cancelation
+  $router->get('/cancellations', function() use ($view, $lang) {
+    $view::json(CancellationController::getAll($lang));
+  });
 };
+
+  // Authenticated routes
+  if (!isset($auth['error'])) echo AuthorizedRoutes::AuthRoutes($router, $url, $view, $auth);
 
 // All Categories
 $router->get('/categories', function() use ($view) {
   $view::json(CategoryController::getAll());
 });
 
-// All Specializations ------- Not working
+// All Specializations
 $router->get('/specialization', function() use ($view) {
   $view::json(SpecializationController::getAll());
 });
@@ -105,9 +129,12 @@ $router->mount('/reset_password', function() use ($router, $view) {
   $router->get('/{email}', function($email) {
     TokenController::generateResetPassword($email);
   });
-  $router->post('/', function() use ($view) {
+  $router->post('/token', function() use ($view) {
     $view::json(TokenController::resetPassword($_POST['password'], $_POST['token']));
   });
+});
+$router->get('/password/{user_id}', function($user_id) use ($view) {
+  $view::json(UserController::getPassword($user_id));
 });
 
 // User
@@ -116,16 +143,27 @@ $router->mount('/users', function() use ($router, $view) {
     $view::json(UserController::getAll());
   });
   $router->get('/{search}', function($search) use ($view) {
-    $view::json(UserController::getUsersBySearch($search));/***REVISAR***/
+    $view::json(UserController::getUsersBySearch($search));
   });
 });
 $router->mount('/user', function() use ($router, $view) {
+  $router->get('/id/{id}', function($id) use ($view) {
+    $view::json(UserController::getUserById($id));
+  });
+  $router->get('/description/{id}', function($user_id) use ($view) {
+    $view::json(UserController::getUserDescription($user_id));
+  });
   $router->get('/{initials}/{tag}/id', function($initial, $tag) use ($view) {
     $view::json(UserController::getId($initial, $tag));
   });
   $router->get('/{initials}/{tag}', function($initial, $tag) use ($view) {
-    $view::json(UserController::getUserByInitialsAndTag($initial, $tag)); // Falta la descripció de l'usuari.
+    $view::json(UserController::getUserByInitialsAndTag($initial, $tag)); 
   });
+});
+
+// ValidateJWT
+$router->post('/validateJWT', function() use ($view) {
+  echo validateJWT($_POST['jwt']);
 });
 
 // Register
@@ -136,6 +174,12 @@ $router->get('/validate/{token}', function($token) {
   UserController::validateUser($token);
   header('Location: https://www.cronose.dawman.info/userValidator');
 });
+$router->get('/dni', function() use ($view){
+  $view::json(UserController::existsDNI($_GET['dni']));
+});
+$router->get('/email', function() use ($view){
+  $view::json(UserController::existsEmail($_GET['email']));
+});
 
 // Login
 $router->post('/login', function()  use ($view){
@@ -145,46 +189,31 @@ $router->post('/login', function()  use ($view){
   else $view::json(UserController::userLogin($_POST['email'], $_POST['password']));
 });
 
-// Works
-$router->post('/work', function() use ($view) {
-  $view::json(WorkController::setNewWork($_REQUEST['data']));
+// Job Offers
+$router->mount('/offer', function() use ($router, $view) {
+  $router->get('/translations', function() use ($view) {
+    $view::json(OfferController::getTranslations($_GET));
+  });
+  $router->get('/visible', function() use ($view) {
+    $view::json(OfferController::getVisibility($_GET));
+  });
 });
-$router->post('/works/filter', function() use ($view) {
-  $view::json(WorkController::getFilteredWorks($_REQUEST['filter']));
+$router->get('/offers/filter', function() use ($view) {
+  $view::json(OfferController::getFilteredOffers());
 });
 
 // Cards
 $router->mount('/cards', function() use ($router, $view) {
-  $router->get('/{worker_id}/{client_id}/{specialization_id}', function($worker_id, $client_id, $specialization_id) use ($view) {
-    $view::json(WorkDemandController::getAllCards($worker_id, $client_id, $specialization_id));
-  });
   $router->get('/{user_id}', function($user_id) use ($view) {
-    $view::json(WorkDemandController::getAll($user_id));
+    $view::json(OfferDemandController::getAll($user_id));
   });
 });
 $router->mount('/card', function() use ($router, $view) {
   $router->get('/{card_id}', function($card_id) use ($view) {
-    $view::json(WorkDemandController::getCard($card_id));
+    $view::json(OfferDemandController::getCard($card_id));
   });
   $router->get('/{status}/{user_id}', function($status, $user_id) use ($view) {
-    $view::json(WorkDemandController::getAllByStatus($user_id, $status));
-  });
-});
-// Demands
-$router->post('/demand', function() use ($view) {
-  $view::json(WorkDemandController::createDemands($_POST['worker_id'], $_POST['client_id'], $_POST['specialization_id']));
-});
-
-// Chat
-$router->get('/chats/{user_id}', function($user_id) use ($view) {
-  $view::json(ChatController::showChats($user_id));
-});
-$router->mount('/chat', function() use ($router, $view) {
-  $router->get('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
-    $view::json(ChatController::showChat($sender_id, $receiver_id));
-  });
-  $router->post('/{sender_id}/{receiver_id}', function($sender_id, $receiver_id) use ($view) {
-    ChatController::sendMSG($sender_id, $receiver_id, $_POST['msg']);
+    $view::json(OfferDemandController::getAllByStatus($user_id, $status));
   });
 });
 
@@ -211,9 +240,12 @@ $router->mount('/seniority', function() use ($router, $view) {
   });
 });
 
-// Valoration
+// Valorations
 $router->get('/valorations/{user_id}/{specialization_id}', function($user_id, $specialization_id) use ($view) {
   $view::json(ValorationController::getWorkerValorations($user_id, $specialization_id));
+});
+$router->post('/valoration', function() use ($view) {
+  $view::json(ValorationController::updateValoration());
 });
 
 // Error 404

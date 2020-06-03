@@ -2,6 +2,7 @@
 
 require_once '../dao/Chat.dao.php';
 require_once 'Achievement.controller.php';
+require_once 'User.controller.php';
 
 class ChatController {
 
@@ -9,20 +10,53 @@ class ChatController {
     return ChatDAO::showAllChat($sender, $receiver);
   }
 
-  public static function showChat($sender, $receiver, $offset, $limit) {
-    return ChatDAO::showChat($sender, $receiver, $offset, $limit);
+  public static function showChat($sender, $receiver, $offset = 0, $limit = 25, $user = true) {
+    $chat = ChatDAO::showChat($sender, $receiver, $offset, $limit, $user);
+    $chat['messages'] = array_reverse($chat['messages']);
+    return $chat;
   }
 
-  public static function sendMSG($sender, $receiver, $msg) {
-    ChatDAO::sendMSG($sender, $receiver, $msg);
+  public static function sendMSG($sender, $receiver, $msg, $date = null) {
+    ChatDAO::sendMSG($sender, $receiver, $msg, $date);
     $achi_id = 2;
     if ( !AchievementController::haveAchi($sender, $achi_id) ) {
       AchievementController::setAchievement($sender, $achi_id);
     }
   }
 
-  public static function showChats($receiver) {
-    return ChatDAO::showChats($receiver);
+  public static function showChats($sender) {
+    $chats = ChatDAO::showChats($sender);
+    foreach ($chats as $value => $key) {
+      foreach ($chats as $val){
+        if ($val["sender_id"] == $key["receiver_id"] && $val["receiver_id"] == $key["sender_id"]) {
+          unset($chats[$value]);
+        }
+      }
+    }
+    $chats = array_values($chats);
+    
+    foreach ($chats as &$user) {
+      $user['receiver'] = ($sender === $user["sender_id"]) ? ChatDAO::getUserData($user["receiver_id"]) : ChatDAO::getUserData($user["sender_id"]) ;
+      $user['last'] = ChatDAO::getLastMessage($sender,$user["receiver"]['id']);
+      unset($user["sender_id"], $user["receiver_id"]);
+    }
+    $chats = self::sortLastMessage($chats);
+    return $chats;
+  }
+
+  public static function sortLastMessage($chats) {
+    for ($e = 0; $e < count($chats); $e++) {
+      for ($i = 0; $i < count($chats) - 1; $i++) {
+        $date1 = explode(' ', $chats[$i]['last']['sended_date']);
+        $date2 = explode(' ', $chats[$i+1]['last']['sended_date']);
+        if (strtotime($date1[0]) < strtotime($date2[0]) || ($date1[0] === $date2[0] && $date1[1] < $date2[1]) ){
+          $aux = $chats[$i];
+          $chats[$i] = $chats[$i+1];
+          $chats[$i+1] = $aux;
+        }
+      };
+    };
+    return $chats;
   }
 
 }

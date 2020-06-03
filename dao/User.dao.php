@@ -19,10 +19,9 @@ class UserDAO extends DAO {
 
   public static function getUserCompleteData(&$user, $lang = null) {
     // Unset name in case of private user
-    $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
-    if ($user['private']) unset($user['name'], $user['surname'], $user['surname_2'], $user['full_name']);
+    self::getFullName($user);
 
-    $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
+    if (!$user['private']) $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
     $user['description'] = UserController::getUserDescription($user, $lang);
     $user['avatar'] = MediaController::getById($user['avatar']) ?? 'sample_avatar';
     $user['address'] =  AddressController::getUserAddress($user);
@@ -30,28 +29,33 @@ class UserDAO extends DAO {
     // $user['Seniority'] = SeniorityController::getRange($user);
 
     // Unset not necessary information
-    unset($user['city'], $user['province'], $user['private'], $user['password'], $user['validated']);
+    unset($user['city'], $user['province'], $user['password'], $user['validated']);
     return $user;
   }
 
-  private static function getUserBasicData(&$user, $avatar) {
+  private static function getUserBasicData(&$user, $lang, $avatar) {
     // Unset name in case of private user
-    $user['full_name'] = "${user['name']} ${user['surname']} ${user['surname_2']}";
-    $user['description'] = self::getUserDescription($user);
-    if ($user['private']) unset($user['name'], $user['surname'], $user['surname_2'], $user['full_name']);
+    self::getFullName($user);
 
     if ($avatar) $user['avatar'] = MediaController::getById($user['avatar_id']);
 
     // Unset not necessary information
-    unset($user['id'], $user['avatar_id'], $user['private']);
+    unset( $user['email'] ,$user['avatar_id'], $user['private']);
   }
 
-  public static function getUserDescription($user) {
-    $sql = "SELECT language_id, description FROM User_Language WHERE user_id = :user_id ";
+  public static function getFullName(&$user) {
+    $user['full_name'] = ($user['private']) 
+      ? substr($user['name'], 0, 1) . ' ' . substr($user['surname'], 0, 1) . ' ' . substr($user['surname_2'], 0, 1)
+      : "${user['name']} ${user['surname']} ${user['surname_2']}";
+    if ($user['private']) unset($user['name'], $user['surname'], $user['surname_2']);
+  }
+  public static function getAuthData($email, $password) {
+    $sql = "SELECT id, initials, tag, email FROM User WHERE email = :email AND password = :password";
     $statement = self::$DB->prepare($sql);
-    $statement->bindParam(':user_id', $user['id'], PDO::PARAM_INT);
+    $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->bindParam(':password', $password, PDO::PARAM_STR);
     $statement->execute();
-    return $statement->fetchAll(PDO::FETCH_ASSOC);    
+    return $statement->fetch(PDO::FETCH_ASSOC);    
   }
 
   public static function getAll() {
@@ -105,24 +109,33 @@ class UserDAO extends DAO {
     return $user;
   }
 
-  public static function getPassword($email) {
-    $fields = self::$returnFields;
-    $sql = "SELECT password,validated,${fields} FROM User WHERE email = :email";
+  public static function getIdByEmail($email) {
+    $sql = "SELECT id FROM User WHERE email = :email;";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':email', $email, PDO::PARAM_STR);
     $statement->execute();
-    $password = $statement->fetch(PDO::FETCH_ASSOC);
-    return $password;
+    return $statement->fetch(PDO::FETCH_ASSOC);
   }
 
-  public static function getBasicUserById($id, $avatar) {
+  public static function getUserById($id) {
+    $fields = self::$returnFields;
+    $sql = "SELECT ${fields} FROM User WHERE id = :id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':id', $id, PDO::PARAM_INT);
+    $statement->execute();
+    $user = $statement->fetch(PDO::FETCH_ASSOC);
+    self::getUserCompleteData($user);
+    return $user;
+  }
+
+  public static function getBasicUserById($id, $lang, $avatar) {
     $fields = self::$returnFields;
     $sql = "SELECT id,initials,tag,name,surname,surname_2,avatar_id,private FROM User WHERE id = :id";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':id', $id, PDO::PARAM_INT);
     $statement->execute();
     $user = $statement->fetch(PDO::FETCH_ASSOC);
-    self::getUserBasicData($user, $avatar);
+    self::getUserBasicData($user, $lang, $avatar);
     return $user;
   }
 
@@ -140,39 +153,66 @@ class UserDAO extends DAO {
     return $users;
   }
 
- 
+  // Create / update user
   public static function saveUser($user, $fiels) {
 
+    /* NAME */
+    $name = ucfirst($user['name']);
+    $surname = ucfirst($user['surname']);
+    $surname_2 = ucfirst($user['surname_2']) ?? null;
     /* DEFAULT VALUES */
-    $surname = ucfirst($user['surname_2']) ?? "";
     $user['private'] = (isset($user['private'])) ? 1 : 0;
     $user['avatar'] = $user['avatar'] ?? 'null';
+    $date = date("Y-m-d H:i:s");
+    $coins = 0;
+    $points = 0;
+    $validated = 1;
     /* SAVE FILES */
 
     /* INITIALS ANS TAG GENERATE */
-    $words = preg_split("/\s+/", "${user['name']} ${user['surname']} ${user['surname_2']}");
+    $words = preg_split("/\s+/", "${name} ${surname} ${surname_2}");
     $initials = "";
     foreach ($words as $w) {
-      $initials .= $w[0];
+      if (isset($w[0])) $initials .= $w[0];
     };
     do{
     $tag = mt_rand(1000, 9999);
     } while(self::getUserByInitialsAndTag($initials, $tag));
 
     $img = ImageController::saveImages($initials, $tag, $fiels);
-    $name = ucfirst($user['name']);
-    $surname = ucfirst($user['surname']);
+    if (!isset($img['dni_img'])) $img['dni_img']['id'] = 1;
 
     /* SQL BEGIN CONSTRUCTION */
-    $fields = "dni, name, surname, surname_2, email, password, tag, initials, coins, registration_date, points, private, city_cp, province_id, avatar_id, dni_photo_id";
-    $values = "'${user['dni']}', '${name}', '${surname}', '${surname_2}', '${user['email']}', '${user['password']}', ";
-    
-    $date = date("Y-m-d H:i:s");
-    $values = $values."${tag}, '${initials}', 0, '${date}', 0, ${user['private']}, ${user['city_cp']}, ${user['province_id']}, ";
-    $values .= $img['avatar']['id'] . ', ' . $img['dni_img']['id'];
+    $fields =  "dni, name, surname, surname_2, email, password, 
+                tag, initials, coins, registration_date, points, private, validated,
+                city_cp, province_id, avatar_id, dni_photo_id";
+    $values =  ":dni, :name, :surname, :surname_2, :email, :password, 
+                :tag, :initials, :coins, :registration_date, :points, :private, :validated,
+                :city_cp, :province_id, :avatar_id, :dni_photo_id";
+
     $sql = "INSERT INTO User (${fields}) VALUES (${values})";
     /* SQL END CONSTRUCTION */
+
     $statement = self::$DB->prepare($sql);
+
+    $statement->bindParam(':dni', $user['dni'], PDO::PARAM_STR);
+    $statement->bindParam(':name', $name, PDO::PARAM_STR);
+    $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
+    $statement->bindParam(':surname_2', $surname_2, PDO::PARAM_STR);
+    $statement->bindParam(':email', $user['email'], PDO::PARAM_STR);
+    $statement->bindParam(':password', $user['password'], PDO::PARAM_STR);
+    $statement->bindParam(':tag', $tag, PDO::PARAM_INT);
+    $statement->bindParam(':initials', $initials, PDO::PARAM_STR);
+    $statement->bindParam(':coins', $coins, PDO::PARAM_INT);
+    $statement->bindParam(':registration_date', $date, PDO::PARAM_STR);
+    $statement->bindParam(':points', $points, PDO::PARAM_INT);
+    $statement->bindParam(':private', $user['private'], PDO::PARAM_INT);
+    $statement->bindParam(':validated', $validated, PDO::PARAM_INT);
+    $statement->bindParam(':city_cp', $user['city_cp'], PDO::PARAM_INT);
+    $statement->bindParam(':province_id', $user['province_id'], PDO::PARAM_INT);
+    $statement->bindParam(':avatar_id', $img['avatar']['id'], PDO::PARAM_INT);
+    $statement->bindParam(':dni_photo_id', $img['dni_img']['id'], PDO::PARAM_INT);
+
     try {
       $statement->execute();
       $errors = $statement->errorInfo();
@@ -198,23 +238,111 @@ class UserDAO extends DAO {
     $statement->execute();
   }
 
-  public static function getUserById($user_id) {
-    $sql = "SELECT * FROM User where id = :user_id;";
+  public static function updateUser($email, $city_cp, $private, $user_id) {
+    $sql = "UPDATE User 
+            SET email = :email, city_cp = :city_cp, private = :private 
+            WHERE User.id = :user_id";
     $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->bindParam(':city_cp', $city_cp, PDO::PARAM_INT);
+    $statement->bindParam(':private', $private, PDO::PARAM_INT);
     $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->execute();
+  }
+
+  // Exists
+  public static function existsDNI($dni) {
+    $sql = "SELECT DNI FROM User 
+            WHERE User.dni = :dni";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':dni', $dni, PDO::PARAM_STR);
     $statement->execute();
     return $statement->fetch(PDO::FETCH_ASSOC);
   }
-
-  public static function getIdByEmail($email) {
-    $sql = "SELECT id FROM User WHERE email = :email;";
+  
+  public static function existsEmail($email) {
+    $sql = "SELECT email FROM User 
+            WHERE User.email = :email";
     $statement = self::$DB->prepare($sql);
     $statement->bindParam(':email', $email, PDO::PARAM_STR);
     $statement->execute();
     return $statement->fetch(PDO::FETCH_ASSOC);
   }
 
-  public static function resetPassword($password, $token) {
+  // User description
+  public static function getUserDescription($user_id) {
+    $sql = "SELECT language_id, description FROM User_Language WHERE user_id = :user_id ";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetchAll(PDO::FETCH_ASSOC);    
+  }
+
+  public static function getDescription($user_id, $lang) {
+    $sql = "SELECT description FROM User_Language WHERE user_id = :user_id AND language_id = :lang";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public static function insertDescription($user_id, $description, $lang) {
+    $sql = "INSERT INTO User_Language(language_id, user_id, description) VALUES(:lang, :user_id, :description)";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':description', $description, PDO::PARAM_STR);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  public static function updateDescription($user_id, $description, $lang) {
+    $sql = "UPDATE User_Language SET description = :description WHERE user_id = :user_id AND language_id = :lang";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':description', $description, PDO::PARAM_STR);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  public static function deleteDescription($user_id, $lang) {
+    $sql = "DELETE FROM User_Language WHERE user_id = :user_id AND language_id = :lang";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':lang', $lang, PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  // PASSWORD
+  public static function getPassword($email) {
+    $fields = self::$returnFields;
+    $sql = "SELECT password,validated,${fields} FROM User WHERE email = :email";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->execute();
+    $password = $statement->fetch(PDO::FETCH_ASSOC);
+    return $password;
+  }
+
+  public static function getPasswordByID($user_id) {
+    $sql = "SELECT password FROM User WHERE id = :user_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public static function updatePassword($password, $user_id) {
+    $sql = "UPDATE User
+            SET password = :password
+            WHERE id = :user_id";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $statement->bindParam(':password', $password, PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  public static function resetPasswordToken($password, $token) {
     $sql = "UPDATE User,Token 
             SET User.password = :password
             WHERE User.id = Token.user_id 
@@ -225,4 +353,28 @@ class UserDAO extends DAO {
     $statement->execute();
   }
 
+  //Images
+  public static function haveAvatar($initials, $tag) {
+    $sql = "SELECT avatar_id, Media.url, Media.extension
+            FROM User, Media 
+            WHERE Media.id = User.avatar_id
+            AND initials = :initials AND tag = :tag";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':initials', $initials, PDO::PARAM_STR);
+    $statement->bindParam(':tag', $tag, PDO::PARAM_INT);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public static function setAvatar($initials, $tag, $avatar_id) {
+    $sql = "UPDATE User
+            SET avatar_id = :avatar_id
+            WHERE initials = :initials
+            AND tag = :tag";
+    $statement = self::$DB->prepare($sql);
+    $statement->bindParam(':avatar_id', $avatar_id, PDO::PARAM_INT);
+    $statement->bindParam(':initials', $initials, PDO::PARAM_STR);
+    $statement->bindParam(':tag', $tag, PDO::PARAM_INT);
+    $statement->execute();
+  }
 }
