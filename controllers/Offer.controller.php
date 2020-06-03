@@ -114,30 +114,3 @@ class OfferController {
   }
 
 }
-
-
-  // public static function getOffersByLang($limit, $offset, $lang) {
-  //   $offers = OfferDAO::getOffersByLang($limit, $offset, $lang);
-
-  //   foreach ($offers as $key => $value) {
-  //     $offers[$key]['translations'] = self::getOfferTranslations($value['user_id'], $value['specialization_id'], $lang);
-  //   }
-    
-  //   return $offers;
-  // }
-
-  // public static function getOffersDefaultLang($limit, $offset, $lang) {
-  //   $offers = OfferDAO::getOffers($limit, $offset);
-
-  //   foreach ($offers as $key => $value) {
-  //     $offers[$key]['user'] = UserController::getBasicUserById($value['user_id'], false, true);
-  //     $offers[$key]['translations'] = self::getOfferTranslations($value['user_id'], $value['specialization_id'], $lang);
-  //     unset($offers[$key]['user_id']);
-  //   }
-
-  //   return $offers;
-  // }
-
-  // public static function getOffersByIdAndLang($id, $lang) {
-  //   return OfferDAO::getOffersByIdAndLang($id, $lang);
-  // }

@@ -41,7 +41,6 @@ class ChatController {
       unset($user["sender_id"], $user["receiver_id"]);
     }
     $chats = self::sortLastMessage($chats);
-    // $chats = array('user' => UserController::getBasicUserById($sender, false, true)) + array('chats' => $chats);
     return $chats;
   }
 

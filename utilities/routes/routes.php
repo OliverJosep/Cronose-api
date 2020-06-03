@@ -67,9 +67,6 @@ if (in_array($lang = $url[0], $avaliable_langs)) {
     $router->get('/all/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
       $view::json(OfferController::getOffersDefaultLang($limit, $offset, $lang));
     });
-    // $router->get('/{offset}/{limit}', function($offset, $limit) use ($view, $lang) {
-    //   $view::json(OfferController::getOffersByLang($limit, $offset, $lang));
-    // });
   });
 
   // Achievements
@@ -96,7 +93,7 @@ $router->get('/categories', function() use ($view) {
   $view::json(CategoryController::getAll());
 });
 
-// All Specializations ------- Not working
+// All Specializations
 $router->get('/specialization', function() use ($view) {
   $view::json(SpecializationController::getAll());
 });
@@ -204,15 +201,9 @@ $router->mount('/offer', function() use ($router, $view) {
 $router->get('/offers/filter', function() use ($view) {
   $view::json(OfferController::getFilteredOffers());
 });
-// $router->get('/offers/filter', function() use ($view) {
-//   $view::json(OfferController::getFilteredOffers());
-// });
 
 // Cards
 $router->mount('/cards', function() use ($router, $view) {
-  // $router->get('/{worker_id}/{client_id}', function($worker_id, $client_id) use ($view) {
-  //   $view::json(OfferDemandController::getAllCards($worker_id, $client_id));
-  // });
   $router->get('/{user_id}', function($user_id) use ($view) {
     $view::json(OfferDemandController::getAll($user_id));
   });

@@ -323,12 +323,12 @@ INSERT INTO DNI_Photo VALUES (1, 'accepted', 1);
 -- INSERT INTO `User` (`id`, `dni`, `name`, `surname`, `surname_2`, `email`, `password`, `tag`, `initials`, `coins`, `registration_date`, `points`, `private`, `city_cp`, `province_id`, `avatar_id`, `dni_photo_id`, `validated`) 
 -- VALUES (NULL, '41617662J', 'Josep', 'Oliver', 'Sanso', 'josep.oliverr@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', '1313', 'JOS', '0.00', '2020-05-01', '0', '0', '7500', '1', NULL, '1', '1');
 
-INSERT INTO `Cancellation_Policy` () VALUES (),(),(),();
+INSERT INTO `Cancellation_Policy` () VALUES ();
 INSERT INTO `Cancellation_Language` (`language_id`, `cancellation_policy_id`, `name`, `description`) 
-VALUES ('ca','1','Nul', 'nul'), ('en', '1', 'Null', 'null'), ('es', '1', 'Nulo', 'nulo'),
-('ca','2','Bàsica', 'bàsica'), ('en', '2', 'Basic', 'basic'), ('es', '2', 'Basica', 'basica'),
-('ca','3','Moderada', 'moderada'), ('en', '3', 'Moderate', 'moderate'), ('es', '3', 'Moderada', 'moderada'),
-('ca','4','Estricta', 'estricta'), ('en', '4', 'Strict', 'strict'), ('es', '4', 'Estricta', 'estricta');
+VALUES ('ca','1','Nul', 'nul'), ('en', '1', 'Null', 'null'), ('es', '1', 'Nulo', 'nulo');
+-- ('ca','2','Bàsica', 'bàsica'), ('en', '2', 'Basic', 'basic'), ('es', '2', 'Basica', 'basica'),
+-- ('ca','3','Moderada', 'moderada'), ('en', '3', 'Moderate', 'moderate'), ('es', '3', 'Moderada', 'moderada'),
+-- ('ca','4','Estricta', 'estricta'), ('en', '4', 'Strict', 'strict'), ('es', '4', 'Estricta', 'estricta');
 
 INSERT INTO Valoration_Label values (),();
 INSERT INTO Valoration_Label_Language values ('es','1', 'Global'), ('en','1', 'Global'), ('ca','1', 'Global');
